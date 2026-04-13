@@ -297,7 +297,7 @@ export default function OverlayPage() {
     try {
       toast({
         title: "restarting server",
-        description: "stopping screenpipe server...",
+        description: "stopping SHOGUN server...",
         duration: 3000,
       });
 
@@ -309,7 +309,7 @@ export default function OverlayPage() {
       
       toast({
         title: "restarting server",
-        description: "starting screenpipe server...",
+        description: "starting SHOGUN server...",
         duration: 3000,
       });
 
@@ -318,14 +318,14 @@ export default function OverlayPage() {
       
       toast({
         title: "server restarted",
-        description: "screenpipe server has been restarted successfully.",
+        description: "SHOGUN server has been restarted successfully.",
         duration: 3000,
       });
     } catch (error) {
       console.error("failed to restart server:", error);
       toast({
         title: "restart failed",
-        description: "failed to restart screenpipe server. please check the logs.",
+        description: "failed to restart SHOGUN server. please check the logs.",
         variant: "destructive",
         duration: 5000,
       });
@@ -372,7 +372,7 @@ export default function OverlayPage() {
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                   <div className="flex flex-col items-center gap-3">
                     <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">connecting to screenpipe...</p>
+                    <p className="text-sm text-muted-foreground">connecting to SHOGUN...</p>
                   </div>
                 </div>
               )}
@@ -392,7 +392,7 @@ export default function OverlayPage() {
                     <div>
                       <h2 className="text-2xl font-bold">Server Not Active</h2>
                       <p className="text-muted-foreground mt-2">
-                        The screenpipe server is not running. Start the server or check permissions to continue.
+                        The SHOGUN server is not running. Start the server or check permissions to continue.
                       </p>
                     </div>
                   </div>
@@ -406,7 +406,7 @@ export default function OverlayPage() {
                       <div>
                         <h3 className="font-semibold">Server Control</h3>
                         <p className="text-sm text-muted-foreground">
-                          Start or restart the screenpipe server
+                          Start or restart the SHOGUN server
                         </p>
                       </div>
                       <Button
@@ -428,7 +428,7 @@ export default function OverlayPage() {
                         <div>
                           <h3 className="font-semibold">System Permissions</h3>
                           <p className="text-sm text-muted-foreground">
-                            Ensure screenpipe has the necessary permissions to function properly
+                            Ensure SHOGUN has the necessary permissions to function properly
                           </p>
                         </div>
                         <div className="space-y-3">

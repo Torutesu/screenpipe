@@ -42,8 +42,8 @@ const NotificationHandler: React.FC = () => {
 
           if (!welcomeShown) {
             sendNotification({
-              title: "welcome to screenpipe",
-              body: "thank you for using screenpipe! we're dedicated to help you get the most out of screenpipe.",
+              title: "welcome to SHOGUN",
+              body: "thank you for using SHOGUN! we're dedicated to help you get the most out of SHOGUN.",
             });
             localStorage?.setItem("welcomeNotificationShown", "true");
           }

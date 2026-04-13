@@ -618,7 +618,7 @@ function MstyPanel() {
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        3. Give the tool a name (e.g. <strong>screenpipe</strong>) and click <strong>Add</strong>
+        3. Give the tool a name (e.g. <strong>shogun</strong>) and click <strong>Add</strong>
       </p>
       <Button variant="outline" onClick={() => openUrl("https://msty.app")} size="sm" className="gap-1.5 h-7 text-xs normal-case font-sans tracking-normal">
         <ExternalLink className="h-3 w-3" />open msty
@@ -649,7 +649,7 @@ function OllamaPanel() {
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Use Ollama as a local AI provider for screenpipe.
+        Use Ollama as a local AI provider for SHOGUN.
       </p>
       <Button onClick={handleCheck} disabled={status === "checking"} size="sm" className="gap-1.5 h-7 text-xs normal-case font-sans tracking-normal">
         {status === "checking" ? (<><Loader2 className="h-3 w-3 animate-spin" />checking...</>) : "check connection"}
@@ -696,11 +696,11 @@ function LMStudioPanel() {
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Connect LM Studio to screenpipe&apos;s screen &amp; audio data, or use it as a local AI provider.
+        Connect LM Studio to SHOGUN&apos;s screen &amp; audio data, or use it as a local AI provider.
       </p>
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => openUrl(deeplink)} size="sm" className="gap-1.5 h-7 text-xs normal-case font-sans tracking-normal">
-          <Download className="h-3 w-3" /> add screenpipe MCP to LM Studio
+          <Download className="h-3 w-3" /> add SHOGUN MCP to LM Studio
         </Button>
         <Button onClick={handleCheck} variant="outline" disabled={status === "checking"} size="sm" className="gap-1.5 h-7 text-xs normal-case font-sans tracking-normal">
           {status === "checking" ? (<><Loader2 className="h-3 w-3 animate-spin" />checking...</>) : "check connection"}
@@ -757,7 +757,7 @@ function BrowserExtensionPanel({ connected, onRefresh }: { connected: boolean; o
       <div>
         <h3 className="text-sm font-medium mb-1">browser extension</h3>
         <p className="text-xs text-muted-foreground">
-          connects your browser to screenpipe so pipes can read data from authenticated pages
+          connects your browser to SHOGUN so pipes can read data from authenticated pages
           (ChatGPT history, Claude conversations, dashboards, etc.)
         </p>
       </div>
@@ -770,7 +770,7 @@ function BrowserExtensionPanel({ connected, onRefresh }: { connected: boolean; o
       {!connected && (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            install the extension, then it auto-connects when screenpipe is running.
+            install the extension, then it auto-connects when SHOGUN is running.
           </p>
           <div className="flex gap-2">
             <Button

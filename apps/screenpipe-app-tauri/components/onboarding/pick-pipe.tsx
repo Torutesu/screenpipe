@@ -20,7 +20,7 @@ const PATHS = [
     pipes: ["obsidian-daily-summary", "todo-list-assistant"],
     notification: {
       title: "🧠 Memory enabled",
-      body: "Screenpipe will now:\n\n- Summarize your day automatically\n- Remind you about things you forgot\n\nFirst summary tonight.",
+      body: "SHOGUN will now:\n\n- Summarize your day automatically\n- Remind you about things you forgot\n\nFirst summary tonight.",
     },
   },
   {
@@ -31,7 +31,7 @@ const PATHS = [
     pipes: ["toggl-time-tracker", "todo-list-assistant"],
     notification: {
       title: "⏱ Time tracking enabled",
-      body: "Screenpipe will now:\n\n- Track time across every app automatically\n- Remind you about follow-ups\n\nFirst report in a few hours.",
+      body: "SHOGUN will now:\n\n- Track time across every app automatically\n- Remind you about follow-ups\n\nFirst report in a few hours.",
     },
   },
   {
@@ -42,7 +42,7 @@ const PATHS = [
     pipes: ["personal-crm", "todo-list-assistant"],
     notification: {
       title: "👥 People tracking enabled",
-      body: "Screenpipe will now:\n\n- Remember everyone you meet\n- Track what you discussed\n- Remind you to follow up\n\nFirst update in a few hours.",
+      body: "SHOGUN will now:\n\n- Remember everyone you meet\n- Track what you discussed\n- Remind you to follow up\n\nFirst update in a few hours.",
     },
   },
 ] as const;

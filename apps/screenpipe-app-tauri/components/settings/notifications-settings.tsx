@@ -40,7 +40,7 @@ export function NotificationsSettings() {
     <div className="space-y-6">
       <div>
         <p className="text-muted-foreground text-sm">
-          Control which notifications screenpipe sends you.
+          Control which notifications SHOGUN sends you.
         </p>
       </div>
 

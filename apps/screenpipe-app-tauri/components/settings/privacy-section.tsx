@@ -186,7 +186,7 @@ export function PrivacySection() {
 
       toast({
         title: "Settings updated successfully",
-        description: "Screenpipe has been restarted with new settings",
+        description: "SHOGUN has been restarted with new settings",
       });
     } catch (error) {
       console.error("Failed to update settings:", error);

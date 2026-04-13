@@ -276,7 +276,7 @@ const OnboardingLogin: React.FC<OnboardingLoginProps> = ({ handleNextSlide }) =>
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        {/* Title: [screenpipe] */}
+        {/* Title: [SHOGUN] */}
         <motion.h1
           className="text-2xl font-bold tracking-tight text-foreground mb-2"
           style={{ fontFamily: "var(--font-sans), 'Space Grotesk', system-ui, sans-serif" }}
@@ -285,7 +285,7 @@ const OnboardingLogin: React.FC<OnboardingLoginProps> = ({ handleNextSlide }) =>
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <span className="text-foreground/30 font-light">[</span>
-          screenpipe
+          SHOGUN
           <span className="text-foreground/30 font-light">]</span>
         </motion.h1>
 

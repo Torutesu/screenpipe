@@ -242,7 +242,7 @@ export function ArchiveSettings() {
             <div className="flex items-center gap-3 mb-3">
               <Lock className="h-5 w-5 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                Cloud archive is available with Screenpipe Pro.
+                Cloud archive is available with SHOGUN Pro.
               </p>
             </div>
             <Button size="sm" onClick={handleCheckout}>

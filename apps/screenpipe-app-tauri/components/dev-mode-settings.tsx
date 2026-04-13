@@ -62,7 +62,7 @@ const getDebuggingCommands = (os: string | null, dataDir: string) => {
     (os === "windows"
       ? `\n\n# We highly recommend adding --ocr-engine windows-native to your command.\n# This will use a very experimental but powerful engine to extract text from your screen instead of the default one.\n# Example: screenpipe --data-dir ${dataDir} --ocr-engine windows-native\n`
       : "") +
-    "\n\n# 5. If you've already started Screenpipe, try these debugging commands:\n";
+    "\n\n# 5. If you've already started SHOGUN, try these debugging commands:\n";
 
   if (os === "windows") {
     return (
@@ -120,7 +120,7 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
   const handleStartScreenpipe = async () => {
     setIsLoading(true);
     const toastId = toast({
-      title: "starting screenpipe",
+      title: "starting SHOGUN",
       description: "please wait...",
       duration: Infinity,
     });
@@ -129,8 +129,8 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       toastId.update({
         id: toastId.id,
-        title: "screenpipe started",
-        description: "screenpipe is now running.",
+        title: "SHOGUN started",
+        description: "SHOGUN is now running.",
         duration: 3000,
       });
     } catch (error) {
@@ -138,7 +138,7 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
       toastId.update({
         id: toastId.id,
         title: "error",
-        description: "failed to start screenpipe.",
+        description: "failed to start SHOGUN.",
         variant: "destructive",
         duration: 3000,
       });
@@ -151,7 +151,7 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
   const handleStopScreenpipe = async () => {
     setIsLoading(true);
     const toastId = toast({
-      title: "stopping screenpipe",
+      title: "stopping SHOGUN",
       description: "please wait...",
       duration: Infinity,
     });
@@ -160,8 +160,8 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       toastId.update({
         id: toastId.id,
-        title: "screenpipe stopped",
-        description: "screenpipe is now stopped.",
+        title: "SHOGUN stopped",
+        description: "SHOGUN is now stopped.",
         duration: 3000,
       });
     } catch (error) {
@@ -169,7 +169,7 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
       toastId.update({
         id: toastId.id,
         title: "error",
-        description: "failed to stop screenpipe.",
+        description: "failed to stop SHOGUN.",
         variant: "destructive",
         duration: 3000,
       });

@@ -168,7 +168,7 @@ export function DisplaySection() {
                 <div>
                   <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
                     Show Overlay in Screen Recording
-                    <HelpTooltip text="When enabled, the screenpipe overlay will be visible in screen recordings and screenshots made by other apps like OBS or Screen Studio." />
+                    <HelpTooltip text="When enabled, the SHOGUN overlay will be visible in screen recordings and screenshots made by other apps like OBS or Screen Studio." />
                   </h3>
                   <p className="text-xs text-muted-foreground">Let OBS, Screen Studio capture the overlay</p>
                 </div>
@@ -225,7 +225,7 @@ export function DisplaySection() {
                 <Monitor className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div>
                   <h3 className="text-sm font-medium text-foreground">Show shortcut reminder</h3>
-                  <p className="text-xs text-muted-foreground">Overlay showing the screenpipe shortcut</p>
+                  <p className="text-xs text-muted-foreground">Overlay showing the SHOGUN shortcut</p>
                 </div>
               </div>
               <Switch

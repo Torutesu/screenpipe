@@ -1306,7 +1306,7 @@ export const AIPresetsSelector = ({
           <div className="flex items-center gap-2 p-2 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg">
             <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
             <span className="text-amber-600 dark:text-amber-400 flex-1">
-              Login required to use Screenpipe Cloud
+              Login required to use SHOGUN Cloud
             </span>
             {showLoginCta && (
               <Button

@@ -341,7 +341,7 @@ function TranscriptionDictionary({
             <Textarea
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
-              placeholder={"paste terms separated by commas, newlines, semicolons, or tabs\n\ne.g. kubernetes, posthog, screenpipe, terraform"}
+              placeholder={"paste terms separated by commas, newlines, semicolons, or tabs\n\ne.g. kubernetes, posthog, shogun, terraform"}
               className="text-xs font-mono min-h-[80px] resize-y"
               spellCheck={false}
               autoCorrect="off"
@@ -469,7 +469,7 @@ function TranscriptionDictionary({
             replacementInput.value = "";
           }}
         >
-          <Input name="vocab-word" placeholder="e.g. screenpipe" className="h-7 text-xs flex-1" spellCheck={false} autoCorrect="off" autoCapitalize="off" />
+          <Input name="vocab-word" placeholder="e.g. shogun" className="h-7 text-xs flex-1" spellCheck={false} autoCorrect="off" autoCapitalize="off" />
           <Input name="vocab-replacement" placeholder="replacement (optional)" className="h-7 text-xs flex-1" spellCheck={false} autoCorrect="off" autoCapitalize="off" />
           <Button type="submit" size="sm" variant="outline" className="h-7 text-xs px-2">
             add
@@ -829,7 +829,7 @@ export function RecordingSettings() {
 
       toast({
         title: "Settings updated successfully",
-        description: "Screenpipe has been restarted with new settings",
+        description: "SHOGUN has been restarted with new settings",
       });
     } catch (error) {
       console.error("Failed to update settings:", error);
@@ -957,11 +957,11 @@ export function RecordingSettings() {
 
 Most of this data gets quietly filtered away before you're even conscious of it. Your visual cortex silently discards ninety-nine percent of what hits your retina, keeping only the fragments it judges important: a familiar face in a crowd, a flash of movement at the edge of your peripheral vision, the subtle shift in someone's expression during a conversation.
 
-Screenpipe works on a similar philosophy. It watches everything that flows through your digital world — every window, every tab, every meeting, every notification — and distills it into searchable, meaningful memory. Think of it as a second brain that never forgets, never gets tired, and never loses track of that important thing someone said three weeks ago on a Tuesday afternoon.
+SHOGUN works on a similar philosophy. It watches everything that flows through your digital world — every window, every tab, every meeting, every notification — and distills it into searchable, meaningful memory. Think of it as a second brain that never forgets, never gets tired, and never loses track of that important thing someone said three weeks ago on a Tuesday afternoon.
 
 The average knowledge worker switches between four hundred different windows per day and types roughly forty words per minute across dozens of applications. Without a system to capture and organize this firehose of information, most of it simply evaporates.
 
-Your screen is a pipe. Everything you see, hear, and type flows through it. Screenpipe just makes sure nothing valuable leaks away.`;
+Your screen is a pipe. Everything you see, hear, and type flows through it. SHOGUN just makes sure nothing valuable leaks away.`;
 
   const handleIgnoredWindowsChange = (values: string[]) => {
     // Convert all values to lowercase for comparison
@@ -1152,7 +1152,7 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
                 <User className="h-4 w-4 text-muted-foreground shrink-0" />
                 <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
                   Your name
-                  <HelpTooltip text="Your name in transcripts. Click 'train' and speak for 30 seconds to teach screenpipe your voice — it will recognize you across all devices using voice matching." />
+                  <HelpTooltip text="Your name in transcripts. Click 'train' and speak for 30 seconds to teach SHOGUN your voice — it will recognize you across all devices using voice matching." />
                 </h3>
               </div>
               <div className="flex items-center gap-1.5">
@@ -1222,7 +1222,7 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
                   <SelectGroup>
                     <SelectLabel className="text-[10px] text-muted-foreground/70 uppercase tracking-wider">cloud</SelectLabel>
                     <SelectItem value="screenpipe-cloud" disabled={!settings.user?.cloud_subscribed}>
-                      Screenpipe Cloud {!settings.user?.cloud_subscribed && "(pro)"}{hwCapability?.recommendedEngine === "screenpipe-cloud" && " ★"}
+                      SHOGUN Cloud {!settings.user?.cloud_subscribed && "(pro)"}{hwCapability?.recommendedEngine === "screenpipe-cloud" && " ★"}
                     </SelectItem>
                     <SelectItem value="deepgram">Deepgram</SelectItem>
                   </SelectGroup>
@@ -1919,7 +1919,7 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
         <DialogContent className="max-w-lg">
           <DialogTitle className="text-sm font-medium">Read this aloud</DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            speak naturally at your normal pace — this helps screenpipe learn your voice
+            speak naturally at your normal pace — this helps SHOGUN learn your voice
           </DialogDescription>
           <div className="space-y-4">
 

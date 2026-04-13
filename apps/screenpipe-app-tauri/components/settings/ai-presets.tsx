@@ -1138,8 +1138,8 @@ const AISection = ({
           {piAvailable && (
             <AIProviderCard
               type="screenpipe-cloud"
-              title="Screenpipe Cloud"
-              description="AI coding agent powered by Screenpipe Cloud. Requires login."
+              title="SHOGUN Cloud"
+              description="AI coding agent powered by SHOGUN Cloud. Requires login."
               imageSrc="/images/screenpipe.png"
               selected={settingsPreset?.provider === "screenpipe-cloud"}
               onClick={() => handleAiProviderChange("screenpipe-cloud")}
@@ -1354,7 +1354,7 @@ const AISection = ({
                           ))}
                         </CommandGroup>
                       )}
-                      <CommandGroup heading={models?.some((m) => m.free) ? "Included with Screenpipe" : "Available Models"}>
+                      <CommandGroup heading={models?.some((m) => m.free) ? "Included with SHOGUN" : "Available Models"}>
                         {models?.filter((m) => !m.free).map((model) => {
                           const costLabel = model.cost_tier === 'low' ? '$' : model.cost_tier === 'medium' ? '$$' : model.cost_tier === 'high' ? '$$$' : model.cost_tier === 'very_high' ? '$$$$' : '';
                           return (
@@ -1452,7 +1452,7 @@ const AISection = ({
               </p>
               <p>
                 GPU strongly recommended. without a dedicated GPU, local models will be very slow and pipes may time out.
-                for best results consider screenpipe cloud or groq as custom provider.
+                for best results consider SHOGUN cloud or groq as custom provider.
               </p>
             </div>
           )}

@@ -111,7 +111,7 @@ function ReferralSection() {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground mb-4">
-        give <span className="font-semibold text-foreground">10% off</span> screenpipe and get{" "}
+        give <span className="font-semibold text-foreground">10% off</span> SHOGUN and get{" "}
         <span className="font-semibold text-foreground">1 free month</span> for each person you refer.
       </p>
       <div className="space-y-4">
@@ -119,7 +119,7 @@ function ReferralSection() {
           <h3 className="text-sm font-medium text-foreground mb-2">how it works</h3>
           <div className="space-y-1.5 text-sm text-muted-foreground">
             <p>1. share your invite link</p>
-            <p>2. they sign up and get <span className="font-semibold text-foreground">10% off</span> screenpipe</p>
+            <p>2. they sign up and get <span className="font-semibold text-foreground">10% off</span> SHOGUN</p>
             <p>3. you get a <span className="font-semibold text-foreground">free month</span> when they start using it</p>
           </div>
         </div>
