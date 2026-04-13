@@ -7241,6 +7241,175 @@ LIMIT ? OFFSET ?
         .await?;
         Ok(rows.into_iter().map(|r| r.0).collect())
     }
+
+    // -----------------------------------------------------------------------
+    // Semantic search: text embedding helpers
+    // -----------------------------------------------------------------------
+
+    /// Insert an embedding vector for a frame (screen capture text).
+    pub async fn insert_frame_embedding(
+        &self,
+        frame_id: i64,
+        embedding: &[f32],
+    ) -> Result<(), SqlxError> {
+        let bytes: &[u8] = embedding.as_bytes();
+        sqlx::query(
+            "INSERT OR REPLACE INTO frame_text_embeddings (frame_id, embedding) \
+             VALUES (?1, vec_f32(?2))",
+        )
+        .bind(frame_id)
+        .bind(bytes)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    /// Insert an embedding vector for an audio transcription.
+    pub async fn insert_audio_embedding(
+        &self,
+        transcription_id: i64,
+        chunk_id: i64,
+        embedding: &[f32],
+    ) -> Result<(), SqlxError> {
+        let bytes: &[u8] = embedding.as_bytes();
+        sqlx::query(
+            "INSERT OR REPLACE INTO audio_text_embeddings (audio_transcription_id, audio_chunk_id, embedding) \
+             VALUES (?1, ?2, vec_f32(?3))",
+        )
+        .bind(transcription_id)
+        .bind(chunk_id)
+        .bind(bytes)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    /// Return frames that do not yet have a text embedding (for backfill).
+    /// Returns `(frame_id, full_text)` pairs limited to `limit`.
+    pub async fn get_unembedded_frames(
+        &self,
+        limit: u32,
+    ) -> Result<Vec<(i64, String)>, SqlxError> {
+        let rows: Vec<(i64, String)> = sqlx::query_as(
+            "SELECT f.id, COALESCE(f.full_text, '') \
+             FROM frames f \
+             LEFT JOIN frame_text_embeddings fte ON f.id = fte.frame_id \
+             WHERE fte.frame_id IS NULL \
+               AND f.full_text IS NOT NULL AND f.full_text != '' \
+             ORDER BY f.id ASC \
+             LIMIT ?1",
+        )
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Return audio transcriptions that do not yet have a text embedding.
+    /// Returns `(transcription_id, chunk_id, transcription_text)` triples.
+    pub async fn get_unembedded_audio(
+        &self,
+        limit: u32,
+    ) -> Result<Vec<(i64, i64, String)>, SqlxError> {
+        let rows: Vec<(i64, i64, String)> = sqlx::query_as(
+            "SELECT at.id, at.audio_chunk_id, at.transcription \
+             FROM audio_transcriptions at \
+             LEFT JOIN audio_text_embeddings ate ON at.id = ate.audio_transcription_id \
+             WHERE ate.audio_transcription_id IS NULL \
+               AND at.transcription IS NOT NULL AND at.transcription != '' \
+             ORDER BY at.id ASC \
+             LIMIT ?1",
+        )
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Find frames whose text embedding is closest to `query_embedding`.
+    /// Returns `(frame_id, cosine_distance)` sorted by ascending distance.
+    pub async fn search_semantic_frames(
+        &self,
+        query_embedding: &[f32],
+        limit: u32,
+        start_time: Option<&str>,
+        end_time: Option<&str>,
+        app_name: Option<&str>,
+        threshold: f64,
+    ) -> Result<Vec<(i64, f64)>, SqlxError> {
+        let bytes: &[u8] = query_embedding.as_bytes();
+        let rows: Vec<(i64, f64)> = sqlx::query_as(
+            r#"SELECT fte.frame_id, vec_distance_cosine(fte.embedding, vec_f32(?1)) as distance
+               FROM frame_text_embeddings fte
+               JOIN frames f ON fte.frame_id = f.id
+               WHERE vec_distance_cosine(fte.embedding, vec_f32(?1)) < ?2
+                 AND (?3 IS NULL OR f.timestamp >= ?3)
+                 AND (?4 IS NULL OR f.timestamp <= ?4)
+                 AND (?5 IS NULL OR f.app_name LIKE '%' || ?5 || '%')
+               ORDER BY distance ASC
+               LIMIT ?6"#,
+        )
+        .bind(bytes)
+        .bind(threshold)
+        .bind(start_time)
+        .bind(end_time)
+        .bind(app_name)
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Find audio transcriptions whose embedding is closest to `query_embedding`.
+    /// Returns `(audio_transcription_id, audio_chunk_id, cosine_distance)`.
+    pub async fn search_semantic_audio(
+        &self,
+        query_embedding: &[f32],
+        limit: u32,
+        start_time: Option<&str>,
+        end_time: Option<&str>,
+        threshold: f64,
+    ) -> Result<Vec<(i64, i64, f64)>, SqlxError> {
+        let bytes: &[u8] = query_embedding.as_bytes();
+        let rows: Vec<(i64, i64, f64)> = sqlx::query_as(
+            r#"SELECT ate.audio_transcription_id, ate.audio_chunk_id,
+                      vec_distance_cosine(ate.embedding, vec_f32(?1)) as distance
+               FROM audio_text_embeddings ate
+               JOIN audio_transcriptions at ON ate.audio_transcription_id = at.id
+               WHERE vec_distance_cosine(ate.embedding, vec_f32(?1)) < ?2
+                 AND (?3 IS NULL OR at.timestamp >= ?3)
+                 AND (?4 IS NULL OR at.timestamp <= ?4)
+               ORDER BY distance ASC
+               LIMIT ?5"#,
+        )
+        .bind(bytes)
+        .bind(threshold)
+        .bind(start_time)
+        .bind(end_time)
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Update the backfill progress tracker.
+    pub async fn update_embedding_progress(
+        &self,
+        last_frame_id: i64,
+        last_audio_id: i64,
+    ) -> Result<(), SqlxError> {
+        sqlx::query(
+            "UPDATE embedding_backfill_progress \
+             SET last_frame_id = ?1, last_audio_id = ?2, \
+                 status = 'running', updated_at = CURRENT_TIMESTAMP \
+             WHERE id = 1",
+        )
+        .bind(last_frame_id)
+        .bind(last_audio_id)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
 }
 
 pub fn find_matching_positions(blocks: &[OcrTextBlock], query: &str) -> Vec<TextPosition> {

@@ -82,6 +82,12 @@ pub async fn pipe_permissions_layer(
 
                 // Single check: is this endpoint allowed for this pipe?
                 if !perms.is_endpoint_allowed(&method, &path) {
+                    tracing::warn!(
+                        pipe = %perms.pipe_name,
+                        method = %method,
+                        path = %path,
+                        "permission denied: endpoint not allowed for pipe"
+                    );
                     return (
                         StatusCode::FORBIDDEN,
                         format!(
@@ -95,6 +101,12 @@ pub async fn pipe_permissions_layer(
 
                 // Also check content-type-based restrictions on audio endpoints
                 if path.starts_with("/speakers") && !perms.is_content_type_allowed("audio") {
+                    tracing::warn!(
+                        pipe = %perms.pipe_name,
+                        method = %method,
+                        path = %path,
+                        "permission denied: audio/speaker access not allowed for pipe"
+                    );
                     return (
                         StatusCode::FORBIDDEN,
                         "audio/speaker access is not permitted for this pipe",
@@ -106,9 +118,21 @@ pub async fn pipe_permissions_layer(
                 req.extensions_mut().insert(perms);
             }
             None => {
-                // Token not in registry — likely hallucinated by the model.
-                // Treat as a regular user request (no restrictions) instead of
-                // hard-rejecting, so pipes don't break from stale session history.
+                // Token not in registry — reject with 403. An `sp_pipe_*` token
+                // that isn't registered means it's stale, hallucinated, or from a
+                // pipe that was stopped. Allowing it through would bypass all
+                // permission enforcement.
+                tracing::warn!(
+                    token = %token,
+                    method = %req.method(),
+                    path = %req.uri().path(),
+                    "rejected request with unknown pipe token (not in registry)"
+                );
+                return (
+                    StatusCode::FORBIDDEN,
+                    "invalid or expired pipe token — pipe may have been stopped or restarted",
+                )
+                    .into_response();
             }
         }
     }

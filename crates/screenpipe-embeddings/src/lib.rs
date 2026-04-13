@@ -180,7 +180,11 @@ mod tests {
 
         // Verify L2-norm is ~1.0
         let norm: f32 = vec.iter().map(|v| v * v).sum::<f32>().sqrt();
-        assert!((norm - 1.0).abs() < 1e-4, "norm should be ~1.0, got {}", norm);
+        assert!(
+            (norm - 1.0).abs() < 1e-4,
+            "norm should be ~1.0, got {}",
+            norm
+        );
     }
 
     #[tokio::test]

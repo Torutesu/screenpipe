@@ -26,6 +26,7 @@ screenpipe-config = { path = "../screenpipe-config" }
 screenpipe-connect = { path = "../screenpipe-connect" }
 screenpipe-vault = { path = "../screenpipe-vault" }
 screenpipe-secrets = { path = "../screenpipe-secrets" }
+screenpipe-embeddings = { path = "../screenpipe-embeddings" }
 
 
 # Image processing

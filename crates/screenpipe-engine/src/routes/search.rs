@@ -569,6 +569,192 @@ where
         .map(Some)
 }
 
+// -----------------------------------------------------------------------
+// Semantic search endpoint
+// -----------------------------------------------------------------------
+
+#[derive(OaSchema, Deserialize)]
+pub(crate) struct SemanticSearchQuery {
+    /// The natural-language query to embed and search for.
+    q: String,
+    /// Maximum results to return (default 20).
+    #[serde(default = "default_limit")]
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    limit: u32,
+    /// Filter: content type — "ocr" (frames), "audio", or "all" (default).
+    #[serde(default)]
+    content_type: ContentType,
+    /// Filter: only results after this timestamp (ISO-8601).
+    #[serde(
+        default,
+        deserialize_with = "super::time::deserialize_flexible_datetime_option"
+    )]
+    start_time: Option<DateTime<Utc>>,
+    /// Filter: only results before this timestamp (ISO-8601).
+    #[serde(
+        default,
+        deserialize_with = "super::time::deserialize_flexible_datetime_option"
+    )]
+    end_time: Option<DateTime<Utc>>,
+    /// Filter: app name (partial, case-insensitive).
+    #[serde(default)]
+    app_name: Option<String>,
+    /// Cosine-distance threshold (0..2, default 0.75). Lower = stricter.
+    #[serde(default = "default_semantic_threshold")]
+    threshold: f64,
+}
+
+fn default_semantic_threshold() -> f64 {
+    0.75
+}
+
+#[derive(Serialize)]
+pub(crate) struct SemanticSearchResult {
+    pub frame_id: Option<i64>,
+    pub audio_transcription_id: Option<i64>,
+    pub audio_chunk_id: Option<i64>,
+    pub distance: f64,
+    pub content_type: String,
+}
+
+#[derive(Serialize)]
+pub(crate) struct SemanticSearchResponse {
+    pub data: Vec<SemanticSearchResult>,
+    pub query: String,
+}
+
+#[oasgen]
+pub(crate) async fn search_semantic(
+    Query(query): Query<SemanticSearchQuery>,
+    State(state): State<Arc<AppState>>,
+) -> Result<JsonResponse<SemanticSearchResponse>, (StatusCode, JsonResponse<Value>)> {
+    let embedder = match state.text_embedder.as_ref() {
+        Some(e) => e.clone(),
+        None => {
+            return Err((
+                StatusCode::SERVICE_UNAVAILABLE,
+                JsonResponse(
+                    json!({"error": "semantic search is not available — text embedder is still loading or failed to initialise"}),
+                ),
+            ));
+        }
+    };
+
+    if query.q.trim().is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            JsonResponse(json!({"error": "query parameter 'q' must not be empty"})),
+        ));
+    }
+
+    debug!(
+        "semantic search: q='{}', limit={}, threshold={}",
+        query.q, query.limit, query.threshold
+    );
+
+    // Embed the query on a blocking thread (CPU-bound).
+    let query_text = query.q.clone();
+    let query_embedding = tokio::task::spawn_blocking(move || embedder.embed(&query_text))
+        .await
+        .map_err(|e| {
+            error!("join error embedding query: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                JsonResponse(json!({"error": "internal error embedding query"})),
+            )
+        })?
+        .map_err(|e| {
+            error!("failed to embed query: {:#}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                JsonResponse(json!({"error": format!("failed to embed query: {}", e)})),
+            )
+        })?;
+
+    let start_str = query.start_time.map(|t| t.to_rfc3339());
+    let end_str = query.end_time.map(|t| t.to_rfc3339());
+
+    let mut results: Vec<SemanticSearchResult> = Vec::new();
+
+    // Search frames (OCR / screen text)
+    let search_frames = matches!(query.content_type, ContentType::All | ContentType::OCR);
+    let search_audio = matches!(query.content_type, ContentType::All | ContentType::Audio);
+
+    if search_frames {
+        let frame_results = state
+            .db
+            .search_semantic_frames(
+                &query_embedding,
+                query.limit,
+                start_str.as_deref(),
+                end_str.as_deref(),
+                query.app_name.as_deref(),
+                query.threshold,
+            )
+            .await
+            .map_err(|e| {
+                error!("semantic frame search failed: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    JsonResponse(json!({"error": format!("semantic frame search failed: {}", e)})),
+                )
+            })?;
+
+        for (frame_id, distance) in frame_results {
+            results.push(SemanticSearchResult {
+                frame_id: Some(frame_id),
+                audio_transcription_id: None,
+                audio_chunk_id: None,
+                distance,
+                content_type: "ocr".to_string(),
+            });
+        }
+    }
+
+    if search_audio {
+        let audio_results = state
+            .db
+            .search_semantic_audio(
+                &query_embedding,
+                query.limit,
+                start_str.as_deref(),
+                end_str.as_deref(),
+                query.threshold,
+            )
+            .await
+            .map_err(|e| {
+                error!("semantic audio search failed: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    JsonResponse(json!({"error": format!("semantic audio search failed: {}", e)})),
+                )
+            })?;
+
+        for (transcription_id, chunk_id, distance) in audio_results {
+            results.push(SemanticSearchResult {
+                frame_id: None,
+                audio_transcription_id: Some(transcription_id),
+                audio_chunk_id: Some(chunk_id),
+                distance,
+                content_type: "audio".to_string(),
+            });
+        }
+    }
+
+    // Sort by distance ascending across both result sets, then truncate to limit.
+    results.sort_by(|a, b| {
+        a.distance
+            .partial_cmp(&b.distance)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    results.truncate(query.limit as usize);
+
+    Ok(JsonResponse(SemanticSearchResponse {
+        data: results,
+        query: query.q,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

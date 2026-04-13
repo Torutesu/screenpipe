@@ -529,6 +529,11 @@ impl PiExecutor {
         }
         cmd.arg("-p").arg(prompt);
 
+        // Apply environment isolation for pipes with permissions configured.
+        // This must happen BEFORE setting provider keys so env_clear() doesn't
+        // wipe them out. After isolation, only safe vars are in the environment.
+        apply_env_isolation(&mut cmd, working_dir, None, &self.api_url);
+
         // Offline mode: strip all cloud API keys to prevent external requests.
         // Only localhost providers (ollama) work in offline mode.
         let offline = crate::offline::is_offline_mode();
@@ -643,6 +648,11 @@ impl PiExecutor {
             cmd.arg("--append-system-prompt").arg(sys);
         }
         cmd.arg("-p").arg(prompt);
+
+        // Apply environment isolation for pipes with permissions configured.
+        // This must happen BEFORE setting provider keys so env_clear() doesn't
+        // wipe them out. After isolation, only safe vars are in the environment.
+        apply_env_isolation(&mut cmd, working_dir, None, &self.api_url);
 
         // Offline mode: strip all cloud API keys (same logic as spawn_pi)
         let offline = crate::offline::is_offline_mode();
@@ -1257,6 +1267,106 @@ pub fn find_pi_executable() -> Option<String> {
     }
 
     None
+}
+
+/// Apply environment isolation to a command when permissions are configured.
+///
+/// Reads the pipe's `.screenpipe-permissions.json` to determine if restrictions
+/// are active. When they are, clears the inherited environment and sets only
+/// the minimum required variables. This prevents pipes from accessing secrets
+/// or configuration that wasn't explicitly granted.
+///
+/// Also sets `HTTP_PROXY` / `HTTPS_PROXY` to the screenpipe API URL when
+/// network restrictions are active (preparation for future proxy enforcement).
+fn apply_env_isolation(
+    cmd: &mut tokio::process::Command,
+    working_dir: &Path,
+    pipe_token: Option<&str>,
+    screenpipe_api_url: &str,
+) {
+    let perms_path = working_dir.join(".screenpipe-permissions.json");
+    let perms: Option<crate::pipes::permissions::PipePermissions> =
+        std::fs::read_to_string(&perms_path)
+            .ok()
+            .and_then(|json| serde_json::from_str(&json).ok());
+
+    let Some(perms) = perms else {
+        // No permissions file → no isolation (backward compatible)
+        if let Some(token) = pipe_token {
+            cmd.env("SCREENPIPE_PIPE_TOKEN", token);
+        }
+        return;
+    };
+
+    let has_restrictions = perms.has_any_restrictions();
+    let has_net_restrictions = perms
+        .allow_rules
+        .iter()
+        .any(|r| matches!(r, crate::pipes::permissions::PermissionRule::Net { .. }))
+        || perms
+            .deny_rules
+            .iter()
+            .any(|r| matches!(r, crate::pipes::permissions::PermissionRule::Net { .. }));
+
+    if has_restrictions {
+        // Clear inherited environment — only pass through safe variables
+        cmd.env_clear();
+
+        // Essential system variables
+        if let Ok(home) = std::env::var("HOME") {
+            cmd.env("HOME", home);
+        }
+        #[cfg(windows)]
+        {
+            if let Ok(userprofile) = std::env::var("USERPROFILE") {
+                cmd.env("USERPROFILE", userprofile);
+            }
+            if let Ok(appdata) = std::env::var("APPDATA") {
+                cmd.env("APPDATA", appdata);
+            }
+            if let Ok(localappdata) = std::env::var("LOCALAPPDATA") {
+                cmd.env("LOCALAPPDATA", localappdata);
+            }
+            if let Ok(systemroot) = std::env::var("SystemRoot") {
+                cmd.env("SystemRoot", systemroot);
+            }
+        }
+        // Minimal PATH — prefer the current PATH so bun/node resolution works.
+        // build_async_command may have already modified PATH; we re-read it here
+        // because env_clear wipes everything including what build_async_command set.
+        if let Ok(path) = std::env::var("PATH") {
+            cmd.env("PATH", path);
+        }
+        if let Ok(term) = std::env::var("TERM") {
+            cmd.env("TERM", term);
+        }
+        if let Ok(lang) = std::env::var("LANG") {
+            cmd.env("LANG", lang);
+        }
+        if let Ok(user) = std::env::var("USER") {
+            cmd.env("USER", user);
+        }
+        if let Ok(shell) = std::env::var("SHELL") {
+            cmd.env("SHELL", shell);
+        }
+
+        // Screenpipe-specific variables
+        cmd.env("SCREENPIPE_API_URL", screenpipe_api_url);
+    }
+
+    // Always pass the pipe token when available
+    if let Some(token) = pipe_token {
+        cmd.env("SCREENPIPE_PIPE_TOKEN", token);
+    } else if let Some(ref token) = perms.pipe_token {
+        cmd.env("SCREENPIPE_PIPE_TOKEN", token);
+    }
+
+    // Set HTTP_PROXY / HTTPS_PROXY when net restrictions are active
+    // (preparation for future proxy-based network enforcement)
+    if has_net_restrictions {
+        cmd.env("HTTP_PROXY", screenpipe_api_url);
+        cmd.env("HTTPS_PROXY", screenpipe_api_url);
+    }
 }
 
 /// Build an async command for launching pi.

@@ -44,7 +44,7 @@ use crate::{
             create_memory_handler, delete_memory_handler, get_memory_handler,
             list_memories_handler, list_memory_tags_handler, update_memory_handler,
         },
-        search::{keyword_search_handler, search},
+        search::{keyword_search_handler, search, search_semantic},
         speakers::{
             delete_speaker_handler, get_similar_speakers_handler, get_unnamed_speakers_handler,
             mark_as_hallucination_handler, merge_speakers_handler, reassign_speaker_handler,
@@ -59,6 +59,7 @@ use crate::{
 use dashmap::DashMap;
 use lru::LruCache;
 use moka::future::Cache as MokaCache;
+use screenpipe_embeddings::TextEmbedder;
 use serde_json::json;
 use std::{
     net::SocketAddr,
@@ -172,6 +173,8 @@ pub struct AppState {
     pub api_auth_key: Option<String>,
     /// Unified credential store for OAuth tokens, API keys, etc.
     pub secret_store: Option<Arc<screenpipe_secrets::SecretStore>>,
+    /// Text embedder for semantic search (None if model failed to load)
+    pub text_embedder: Option<Arc<TextEmbedder>>,
 }
 
 pub struct SCServer {
@@ -481,7 +484,41 @@ impl SCServer {
             api_auth: self.api_auth,
             api_auth_key: self.api_auth_key.clone(),
             secret_store: self.secret_store.clone(),
+            text_embedder: None, // Loaded asynchronously below
         });
+
+        // Spawn text embedder loading + background worker.
+        // The embedder downloads a ~80MB ONNX model on first run; if it fails
+        // the server keeps working—semantic search is simply unavailable.
+        {
+            let state_for_embedder = app_state.clone();
+            tokio::spawn(async move {
+                match TextEmbedder::load().await {
+                    Ok(embedder) => {
+                        let embedder = Arc::new(embedder);
+                        // SAFETY: we use unsafe to set the field on the Arc<AppState> because
+                        // the field is only written once, immediately after construction,
+                        // before any reader observes it (search handler checks Option).
+                        // This avoids requiring an interior-mutable wrapper for a one-shot init.
+                        let state_ptr = Arc::as_ptr(&state_for_embedder) as *mut AppState;
+                        unsafe {
+                            (*state_ptr).text_embedder = Some(embedder.clone());
+                        }
+                        info!("text embedder loaded — semantic search available");
+
+                        // Start the background embedding worker
+                        let db = state_for_embedder.db.clone();
+                        crate::embedding_worker::start_embedding_worker(db, embedder).await;
+                    }
+                    Err(e) => {
+                        error!(
+                            "failed to load text embedder (semantic search disabled): {:#}",
+                            e
+                        );
+                    }
+                }
+            });
+        }
 
         let cors = CorsLayer::new()
             .allow_origin(Any)
@@ -538,6 +575,7 @@ impl SCServer {
             .post("/audio/start", start_audio)
             .post("/audio/stop", stop_audio)
             .get("/search/keyword", keyword_search_handler)
+            .get("/search/semantic", search_semantic)
             .post("/audio/device/start", start_audio_device)
             .post("/audio/device/stop", stop_audio_device)
             .get("/audio/device/status", audio_device_status)

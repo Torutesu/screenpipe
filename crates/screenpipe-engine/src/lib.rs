@@ -23,6 +23,7 @@ pub mod routes;
 pub mod schedule_monitor;
 pub mod secret_oauth;
 
+pub mod embedding_worker;
 pub mod event_driven_capture;
 pub mod hot_frame_cache;
 pub mod meeting_detector;

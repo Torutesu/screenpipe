@@ -529,6 +529,162 @@ impl PipePermissions {
         allowed_days.contains(&day_num)
     }
 
+    /// Check if a network destination is allowed.
+    ///
+    /// If no Net rules exist (neither allow nor deny), all destinations are allowed
+    /// (backward compatible). When Net rules exist: deny wins, then allow is checked,
+    /// then default-reject.
+    pub fn is_net_allowed(&self, host: &str, port: Option<u16>) -> bool {
+        let has_net_rules = self
+            .allow_rules
+            .iter()
+            .any(|r| matches!(r, PermissionRule::Net { .. }))
+            || self
+                .deny_rules
+                .iter()
+                .any(|r| matches!(r, PermissionRule::Net { .. }));
+        if !has_net_rules {
+            return true;
+        }
+
+        let lower_host = host.to_lowercase();
+
+        // Deny wins
+        for rule in &self.deny_rules {
+            if let PermissionRule::Net {
+                host: rh,
+                port: rp,
+            } = rule
+            {
+                if net_host_matches(rh, &lower_host) && net_port_matches(*rp, port) {
+                    return false;
+                }
+            }
+        }
+
+        // Explicit allow
+        let has_allows = self
+            .allow_rules
+            .iter()
+            .any(|r| matches!(r, PermissionRule::Net { .. }));
+        if !has_allows {
+            return true; // Only deny rules active, and none matched
+        }
+        for rule in &self.allow_rules {
+            if let PermissionRule::Net {
+                host: rh,
+                port: rp,
+            } = rule
+            {
+                if net_host_matches(rh, &lower_host) && net_port_matches(*rp, port) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Check if filesystem access is allowed.
+    ///
+    /// If no Fs rules exist (neither allow nor deny), all paths are allowed
+    /// (backward compatible). When Fs rules exist: deny wins, then allow is checked,
+    /// then default-reject.
+    pub fn is_fs_allowed(&self, mode: &FsMode, path: &Path) -> bool {
+        let has_fs_rules = self
+            .allow_rules
+            .iter()
+            .any(|r| matches!(r, PermissionRule::Fs { .. }))
+            || self
+                .deny_rules
+                .iter()
+                .any(|r| matches!(r, PermissionRule::Fs { .. }));
+        if !has_fs_rules {
+            return true;
+        }
+
+        let path_str = path.to_string_lossy();
+
+        // Deny wins
+        for rule in &self.deny_rules {
+            if let PermissionRule::Fs {
+                mode: rm,
+                path: rp,
+            } = rule
+            {
+                if fs_mode_matches(rm, mode) && fs_path_matches(rp, &path_str) {
+                    return false;
+                }
+            }
+        }
+
+        // Explicit allow
+        let has_allows = self
+            .allow_rules
+            .iter()
+            .any(|r| matches!(r, PermissionRule::Fs { .. }));
+        if !has_allows {
+            return true;
+        }
+        for rule in &self.allow_rules {
+            if let PermissionRule::Fs {
+                mode: rm,
+                path: rp,
+            } = rule
+            {
+                if fs_mode_matches(rm, mode) && fs_path_matches(rp, &path_str) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Check if an executable is allowed.
+    ///
+    /// If no Exec rules exist, all executables are allowed (backward compatible).
+    /// When Exec rules exist: deny wins, then allow is checked, then default-reject.
+    pub fn is_exec_allowed(&self, executable: &str) -> bool {
+        let has_exec_rules = self
+            .allow_rules
+            .iter()
+            .any(|r| matches!(r, PermissionRule::Exec { .. }))
+            || self
+                .deny_rules
+                .iter()
+                .any(|r| matches!(r, PermissionRule::Exec { .. }));
+        if !has_exec_rules {
+            return true;
+        }
+
+        let exec_lower = executable.to_lowercase();
+
+        // Deny wins
+        for rule in &self.deny_rules {
+            if let PermissionRule::Exec { value: name } = rule {
+                if name.to_lowercase() == exec_lower {
+                    return false;
+                }
+            }
+        }
+
+        // Explicit allow
+        let has_allows = self
+            .allow_rules
+            .iter()
+            .any(|r| matches!(r, PermissionRule::Exec { .. }));
+        if !has_allows {
+            return true;
+        }
+        for rule in &self.allow_rules {
+            if let PermissionRule::Exec { value: name } = rule {
+                if name.to_lowercase() == exec_lower {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     /// Combined check for data filtering.
     pub fn is_item_allowed(
         &self,
@@ -602,7 +758,44 @@ fn resolve_rules(
                     }
                     (allow, vec![], true, None, None)
                 }
-                "reader" => (vec![], vec![], true, None, None),
+                "reader" => {
+                    // Reader: default API allowlist + restrict network to localhost only.
+                    // Uses allow-only Net rules: when allow rules exist but the
+                    // destination doesn't match, the default is reject. No deny
+                    // needed — the allow list is the allowlist.
+                    let allow = vec![PermissionRule::Net {
+                        host: "localhost".to_string(),
+                        port: None,
+                    }];
+                    (allow, vec![], true, None, None)
+                }
+                "sandboxed" => {
+                    // Sandboxed: reader + filesystem restricted to pipe dir + no external net.
+                    // Uses allow-only rules for Net and Fs: unmatched destinations/paths
+                    // are rejected by default when allow rules exist.
+                    let mut allow = vec![
+                        PermissionRule::Net {
+                            host: "localhost".to_string(),
+                            port: None,
+                        },
+                        // Filesystem restricted to current dir only
+                        PermissionRule::Fs {
+                            mode: FsMode::Read,
+                            path: ".".to_string(),
+                        },
+                        PermissionRule::Fs {
+                            mode: FsMode::Write,
+                            path: ".".to_string(),
+                        },
+                    ];
+                    // Also add default API read endpoints
+                    for pattern in DEFAULT_ALLOWED_ENDPOINTS {
+                        if let Some(rule) = parse_bare_api(pattern) {
+                            allow.push(rule);
+                        }
+                    }
+                    (allow, vec![], false, None, None)
+                }
                 // "none" or unrecognized → no restrictions
                 _ => (vec![], vec![], false, None, None),
             }
@@ -667,6 +860,52 @@ fn glob_match(pattern: &str, text: &str) -> bool {
         px += 1;
     }
     px == pb.len()
+}
+
+// ---------------------------------------------------------------------------
+// Net / Fs matching helpers
+// ---------------------------------------------------------------------------
+
+/// Check if a rule host pattern matches a given host.
+/// Supports `*` as wildcard for all hosts, and case-insensitive comparison.
+fn net_host_matches(pattern: &str, host: &str) -> bool {
+    if pattern == "*" {
+        return true;
+    }
+    pattern.to_lowercase() == host.to_lowercase()
+}
+
+/// Check if a rule port matches a given port.
+/// `None` rule port means "any port" (wildcard).
+fn net_port_matches(rule_port: Option<u16>, actual_port: Option<u16>) -> bool {
+    match rule_port {
+        None => true, // Rule has no port constraint → matches any port
+        Some(rp) => actual_port.map_or(false, |ap| rp == ap),
+    }
+}
+
+/// Check if a Fs rule mode matches the requested mode.
+/// Write implies Read (a write rule also allows reading).
+fn fs_mode_matches(rule_mode: &FsMode, requested_mode: &FsMode) -> bool {
+    match (rule_mode, requested_mode) {
+        (FsMode::Write, FsMode::Read) => true, // Write permission implies read
+        _ => rule_mode == requested_mode,
+    }
+}
+
+/// Check if a filesystem path matches a rule path pattern.
+/// Uses prefix matching: a rule path of `./data` matches `./data/file.txt`.
+fn fs_path_matches(rule_path: &str, actual_path: &str) -> bool {
+    if rule_path == "*" {
+        return true;
+    }
+    // Normalize: remove trailing slashes for consistent comparison
+    let rule_normalized = rule_path.trim_end_matches('/');
+    let actual_normalized = actual_path.trim_end_matches('/');
+
+    // Exact match or prefix match (with path separator boundary)
+    actual_normalized == rule_normalized
+        || actual_normalized.starts_with(&format!("{}/", rule_normalized))
 }
 
 // ---------------------------------------------------------------------------
@@ -1112,5 +1351,259 @@ mod tests {
 
         let deserialized: PipePermissions = serde_json::from_str(&json).unwrap();
         assert!(deserialized.offline_mode);
+    }
+
+    // -- Net rule parsing tests -----------------------------------------------
+
+    #[test]
+    fn parse_net_host_port() {
+        let rules = parse_rules("Net(api.openai.com:443)");
+        assert_eq!(rules.len(), 1);
+        assert!(
+            matches!(&rules[0], PermissionRule::Net { host, port } if host == "api.openai.com" && *port == Some(443))
+        );
+    }
+
+    #[test]
+    fn parse_net_wildcard() {
+        let rules = parse_rules("Net(*)");
+        assert_eq!(rules.len(), 1);
+        assert!(matches!(&rules[0], PermissionRule::Net { host, port } if host == "*" && port.is_none()));
+    }
+
+    #[test]
+    fn parse_net_host_wildcard_port() {
+        let rules = parse_rules("Net(localhost:*)");
+        assert_eq!(rules.len(), 1);
+        assert!(matches!(&rules[0], PermissionRule::Net { host, port } if host == "localhost" && port.is_none()));
+    }
+
+    #[test]
+    fn parse_net_multi() {
+        let rules = parse_rules("Net(api.openai.com:443, example.com)");
+        assert_eq!(rules.len(), 2);
+        assert!(
+            matches!(&rules[0], PermissionRule::Net { host, port } if host == "api.openai.com" && *port == Some(443))
+        );
+        assert!(matches!(&rules[1], PermissionRule::Net { host, port } if host == "example.com" && port.is_none()));
+    }
+
+    // -- Fs rule parsing tests ------------------------------------------------
+
+    #[test]
+    fn parse_fs_read() {
+        let rules = parse_rules("Fs(read ./data)");
+        assert_eq!(rules.len(), 1);
+        assert!(
+            matches!(&rules[0], PermissionRule::Fs { mode, path } if *mode == FsMode::Read && path == "./data")
+        );
+    }
+
+    #[test]
+    fn parse_fs_write() {
+        let rules = parse_rules("Fs(write ./output)");
+        assert_eq!(rules.len(), 1);
+        assert!(
+            matches!(&rules[0], PermissionRule::Fs { mode, path } if *mode == FsMode::Write && path == "./output")
+        );
+    }
+
+    // -- Exec rule parsing tests ----------------------------------------------
+
+    #[test]
+    fn parse_exec_multi() {
+        let rules = parse_rules("Exec(curl, git)");
+        assert_eq!(rules.len(), 2);
+        assert!(matches!(&rules[0], PermissionRule::Exec { value } if value == "curl"));
+        assert!(matches!(&rules[1], PermissionRule::Exec { value } if value == "git"));
+    }
+
+    // -- Net permission checker tests -----------------------------------------
+
+    #[test]
+    fn net_no_rules_allows_all() {
+        let p = make_perms();
+        assert!(p.is_net_allowed("api.openai.com", Some(443)));
+        assert!(p.is_net_allowed("evil.com", Some(80)));
+    }
+
+    #[test]
+    fn net_allow_restricts() {
+        let mut p = make_perms();
+        p.allow_rules = vec![PermissionRule::Net {
+            host: "api.openai.com".to_string(),
+            port: Some(443),
+        }];
+        assert!(p.is_net_allowed("api.openai.com", Some(443)));
+        assert!(!p.is_net_allowed("api.openai.com", Some(80)));
+        assert!(!p.is_net_allowed("evil.com", Some(443)));
+    }
+
+    #[test]
+    fn net_deny_wildcard_blocks_all() {
+        let mut p = make_perms();
+        p.deny_rules = vec![PermissionRule::Net {
+            host: "*".to_string(),
+            port: None,
+        }];
+        p.allow_rules = vec![PermissionRule::Net {
+            host: "localhost".to_string(),
+            port: None,
+        }];
+        // Deny wins over allow — wildcard deny blocks everything including localhost.
+        // This is the correct "deny → allow → reject" evaluation order.
+        assert!(!p.is_net_allowed("localhost", Some(3030)));
+        assert!(!p.is_net_allowed("evil.com", Some(443)));
+    }
+
+    #[test]
+    fn net_allow_only_localhost() {
+        // For the reader preset to work correctly, we need allow-only (no deny)
+        // with specific allow rules. When there are allow rules but no deny rules,
+        // unmatched destinations are rejected by default.
+        let mut p = make_perms();
+        p.allow_rules = vec![PermissionRule::Net {
+            host: "localhost".to_string(),
+            port: None,
+        }];
+        assert!(p.is_net_allowed("localhost", Some(3030)));
+        assert!(p.is_net_allowed("localhost", None));
+        assert!(!p.is_net_allowed("evil.com", Some(443)));
+    }
+
+    // -- Fs permission checker tests ------------------------------------------
+
+    #[test]
+    fn fs_no_rules_allows_all() {
+        let p = make_perms();
+        assert!(p.is_fs_allowed(&FsMode::Read, Path::new("/etc/passwd")));
+        assert!(p.is_fs_allowed(&FsMode::Write, Path::new("/tmp/output")));
+    }
+
+    #[test]
+    fn fs_allow_restricts() {
+        let mut p = make_perms();
+        p.allow_rules = vec![PermissionRule::Fs {
+            mode: FsMode::Read,
+            path: "./data".to_string(),
+        }];
+        assert!(p.is_fs_allowed(&FsMode::Read, Path::new("./data/file.txt")));
+        assert!(p.is_fs_allowed(&FsMode::Read, Path::new("./data")));
+        assert!(!p.is_fs_allowed(&FsMode::Read, Path::new("./secrets")));
+        assert!(!p.is_fs_allowed(&FsMode::Write, Path::new("./data/file.txt")));
+    }
+
+    #[test]
+    fn fs_write_implies_read() {
+        let mut p = make_perms();
+        p.deny_rules = vec![PermissionRule::Fs {
+            mode: FsMode::Write,
+            path: "./data".to_string(),
+        }];
+        // A deny-write rule also blocks reads (write implies read in matching)
+        assert!(!p.is_fs_allowed(&FsMode::Read, Path::new("./data/file.txt")));
+    }
+
+    // -- Exec permission checker tests ----------------------------------------
+
+    #[test]
+    fn exec_no_rules_allows_all() {
+        let p = make_perms();
+        assert!(p.is_exec_allowed("curl"));
+        assert!(p.is_exec_allowed("rm"));
+    }
+
+    #[test]
+    fn exec_allow_restricts() {
+        let mut p = make_perms();
+        p.allow_rules = vec![
+            PermissionRule::Exec {
+                value: "curl".to_string(),
+            },
+            PermissionRule::Exec {
+                value: "git".to_string(),
+            },
+        ];
+        assert!(p.is_exec_allowed("curl"));
+        assert!(p.is_exec_allowed("git"));
+        assert!(!p.is_exec_allowed("rm"));
+    }
+
+    #[test]
+    fn exec_deny_wins() {
+        let mut p = make_perms();
+        p.allow_rules = vec![PermissionRule::Exec {
+            value: "curl".to_string(),
+        }];
+        p.deny_rules = vec![PermissionRule::Exec {
+            value: "curl".to_string(),
+        }];
+        assert!(!p.is_exec_allowed("curl"));
+    }
+
+    // -- Sandboxed preset tests -----------------------------------------------
+
+    #[test]
+    fn from_config_sandboxed_preset() {
+        let config = PipeConfig {
+            name: "sandboxed-test".to_string(),
+            schedule: "manual".to_string(),
+            enabled: true,
+            agent: "pi".to_string(),
+            model: "claude-haiku-4-5".to_string(),
+            provider: None,
+            preset: vec![],
+            permissions: PipePermissionsConfig::Preset("sandboxed".to_string()),
+            connections: vec![],
+            timeout: None,
+            source_slug: None,
+            installed_version: None,
+            source_hash: None,
+            trigger: None,
+            config: std::collections::HashMap::new(),
+        };
+        let perms = PipePermissions::from_config(&config);
+        assert!(perms.has_any_restrictions());
+
+        // API: default reader endpoints work
+        assert!(perms.is_endpoint_allowed("GET", "/search"));
+        assert!(!perms.is_endpoint_allowed("POST", "/meetings/stop"));
+
+        // Net: only localhost allowed
+        assert!(perms.is_net_allowed("localhost", Some(3030)));
+        assert!(!perms.is_net_allowed("evil.com", Some(443)));
+
+        // Fs: only current dir allowed
+        assert!(perms.is_fs_allowed(&FsMode::Read, Path::new("./file.txt")));
+        assert!(perms.is_fs_allowed(&FsMode::Write, Path::new("./output.json")));
+        assert!(!perms.is_fs_allowed(&FsMode::Read, Path::new("/etc/passwd")));
+    }
+
+    // -- Reader preset with Net rules -----------------------------------------
+
+    #[test]
+    fn from_config_reader_preset_net_rules() {
+        let config = PipeConfig {
+            name: "reader-net-test".to_string(),
+            schedule: "manual".to_string(),
+            enabled: true,
+            agent: "pi".to_string(),
+            model: "claude-haiku-4-5".to_string(),
+            provider: None,
+            preset: vec![],
+            permissions: PipePermissionsConfig::Preset("reader".to_string()),
+            connections: vec![],
+            timeout: None,
+            source_slug: None,
+            installed_version: None,
+            source_hash: None,
+            trigger: None,
+            config: std::collections::HashMap::new(),
+        };
+        let perms = PipePermissions::from_config(&config);
+
+        // Reader preset: only localhost net allowed
+        assert!(perms.is_net_allowed("localhost", Some(3030)));
+        assert!(!perms.is_net_allowed("evil.com", Some(443)));
     }
 }

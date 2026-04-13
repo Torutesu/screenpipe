@@ -7216,6 +7216,7 @@ dependencies = [
  "screenpipe-connect",
  "screenpipe-core",
  "screenpipe-db",
+ "screenpipe-embeddings",
  "screenpipe-events",
  "screenpipe-screen",
  "screenpipe-secrets",
