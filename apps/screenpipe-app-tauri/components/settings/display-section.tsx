@@ -150,7 +150,7 @@ export function DisplaySection() {
                           await invoke("reset_main_window");
                         } catch (_) {}
                         toast({
-                          title: "overlay mode updated",
+                          title: t("settings.display.overlayModeUpdated"),
                           description: `press the shortcut to open timeline in ${option.label.toLowerCase()} mode.`,
                         });
                       }}
@@ -177,8 +177,8 @@ export function DisplaySection() {
               <div className="flex items-center space-x-2.5">
                 <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div>
-                  <h3 className="text-sm font-medium text-foreground">Chat always on top</h3>
-                  <p className="text-xs text-muted-foreground">Keep chat window above other windows</p>
+                  <h3 className="text-sm font-medium text-foreground">{t("settings.display.chatOnTop")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("settings.display.chatOnTopDesc")}</p>
                 </div>
               </div>
               <Switch
@@ -199,7 +199,7 @@ export function DisplaySection() {
                 <Monitor className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div>
                   <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
-                    Show Overlay in Screen Recording
+                    {t("settings.display.showOverlayInRecording")}
                     <HelpTooltip text="When enabled, the SHOGUN overlay will be visible in screen recordings and screenshots made by other apps like OBS or Screen Studio." />
                   </h3>
                   <p className="text-xs text-muted-foreground">Let OBS, Screen Studio capture the overlay</p>
@@ -230,7 +230,7 @@ export function DisplaySection() {
                   <PanelLeft className="h-4 w-4 text-muted-foreground shrink-0" />
                   <div>
                     <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
-                      Translucent Sidebar
+                      {t("settings.display.translucentSidebar")}
                       <HelpTooltip text="Apply a macOS vibrancy effect to the sidebar for a frosted glass look." />
                     </h3>
                     <p className="text-xs text-muted-foreground">Frosted glass sidebar effect</p>
@@ -256,8 +256,8 @@ export function DisplaySection() {
               <div className="flex items-center space-x-2.5">
                 <Monitor className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div>
-                  <h3 className="text-sm font-medium text-foreground">Show shortcut reminder</h3>
-                  <p className="text-xs text-muted-foreground">Overlay showing the SHOGUN shortcut</p>
+                  <h3 className="text-sm font-medium text-foreground">{t("settings.display.shortcutReminder")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("settings.display.shortcutReminderDesc")}</p>
                 </div>
               </div>
               <Switch
@@ -285,15 +285,15 @@ export function DisplaySection() {
                 <div className="flex items-center space-x-2.5">
                   <Maximize2 className="h-4 w-4 text-muted-foreground shrink-0" />
                   <div>
-                    <h3 className="text-sm font-medium text-foreground">Overlay size</h3>
-                    <p className="text-xs text-muted-foreground">Size of the shortcut reminder overlay</p>
+                    <h3 className="text-sm font-medium text-foreground">{t("settings.display.overlaySize")}</h3>
+                    <p className="text-xs text-muted-foreground">{t("settings.display.overlaySizeDesc")}</p>
                   </div>
                 </div>
                 <div className="flex gap-2 ml-[26px]">
                   {([
-                    { value: "small", label: "Small" },
-                    { value: "medium", label: "Medium" },
-                    { value: "large", label: "Large" },
+                    { value: "small", label: t("settings.display.small") },
+                    { value: "medium", label: t("settings.display.medium") },
+                    { value: "large", label: t("settings.display.large") },
                   ]).map((option) => {
                     const isActive = (settings?.shortcutOverlaySize ?? "small") === option.value;
                     return (
