@@ -3201,6 +3201,25 @@ impl PipeManager {
                             token_registry.as_ref(),
                         )
                         .await;
+                    } else if config.agent == "claude-code" {
+                        let api_url = format!("http://localhost:{}", api_port);
+                        let pipe_dir_setup = pipes_dir.join(name);
+                        pipe_token = setup_pipe_permissions(
+                            &pipe_dir_setup,
+                            config,
+                            token_registry.as_ref(),
+                        )
+                        .await;
+
+                        if let Err(e) = ClaudeCodeExecutor::ensure_screenpipe_claude_md(
+                            &pipe_dir_setup,
+                            &api_url,
+                            pipe_token.as_deref(),
+                        ) {
+                            warn!("scheduler: failed to write screenpipe CLAUDE.md: {}", e);
+                        }
+
+                        ClaudeCodeExecutor::ensure_mcp_config(&pipe_dir_setup);
                     }
 
                     // Check if history/session continuation is enabled
