@@ -1,5 +1,8 @@
 {
   "name": "shogun",
+  "description": "Work Memory + Always-on Agent. Built by Select KK.",
+  "homepage": "https://syogun.com",
+  "author": "Select KK <hello@syogun.com>",
   "private": true,
   "scripts": {
     "dev": "next dev -p 1420",
