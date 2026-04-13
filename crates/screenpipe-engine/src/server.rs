@@ -173,8 +173,8 @@ pub struct AppState {
     pub api_auth_key: Option<String>,
     /// Unified credential store for OAuth tokens, API keys, etc.
     pub secret_store: Option<Arc<screenpipe_secrets::SecretStore>>,
-    /// Text embedder for semantic search (None if model failed to load)
-    pub text_embedder: Option<Arc<TextEmbedder>>,
+    /// Text embedder for semantic search (set once after async model load).
+    pub text_embedder: std::sync::OnceLock<Arc<TextEmbedder>>,
 }
 
 pub struct SCServer {
@@ -484,7 +484,7 @@ impl SCServer {
             api_auth: self.api_auth,
             api_auth_key: self.api_auth_key.clone(),
             secret_store: self.secret_store.clone(),
-            text_embedder: None, // Loaded asynchronously below
+            text_embedder: std::sync::OnceLock::new(), // Loaded asynchronously below
         });
 
         // Spawn text embedder loading + background worker.
@@ -496,14 +496,7 @@ impl SCServer {
                 match TextEmbedder::load().await {
                     Ok(embedder) => {
                         let embedder = Arc::new(embedder);
-                        // SAFETY: we use unsafe to set the field on the Arc<AppState> because
-                        // the field is only written once, immediately after construction,
-                        // before any reader observes it (search handler checks Option).
-                        // This avoids requiring an interior-mutable wrapper for a one-shot init.
-                        let state_ptr = Arc::as_ptr(&state_for_embedder) as *mut AppState;
-                        unsafe {
-                            (*state_ptr).text_embedder = Some(embedder.clone());
-                        }
+                        let _ = state_for_embedder.text_embedder.set(embedder.clone());
                         info!("text embedder loaded — semantic search available");
 
                         // Start the background embedding worker

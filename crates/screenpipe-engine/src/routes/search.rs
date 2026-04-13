@@ -628,7 +628,7 @@ pub(crate) async fn search_semantic(
     Query(query): Query<SemanticSearchQuery>,
     State(state): State<Arc<AppState>>,
 ) -> Result<JsonResponse<SemanticSearchResponse>, (StatusCode, JsonResponse<Value>)> {
-    let embedder = match state.text_embedder.as_ref() {
+    let embedder = match state.text_embedder.get() {
         Some(e) => e.clone(),
         None => {
             return Err((
