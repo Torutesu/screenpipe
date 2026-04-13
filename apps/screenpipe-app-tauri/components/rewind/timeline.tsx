@@ -1127,7 +1127,7 @@ export default function Timeline({ embedded = false }: { embedded?: boolean }) {
 										Building Your Memory
 									</h3>
 									<p className="text-muted-foreground mb-6 leading-relaxed">
-										Screenpipe is recording your screen activity. Your timeline will appear here as frames are captured.
+										SHOGUN is recording your screen activity. Your timeline will appear here as frames are captured.
 									</p>
 
 									{/* Friendly suggestion */}
