@@ -608,7 +608,7 @@ fn default_semantic_threshold() -> f64 {
     0.75
 }
 
-#[derive(Serialize)]
+#[derive(OaSchema, Serialize, Clone)]
 pub(crate) struct SemanticSearchResult {
     pub frame_id: Option<i64>,
     pub audio_transcription_id: Option<i64>,
@@ -617,7 +617,7 @@ pub(crate) struct SemanticSearchResult {
     pub content_type: String,
 }
 
-#[derive(Serialize)]
+#[derive(OaSchema, Serialize, Clone)]
 pub(crate) struct SemanticSearchResponse {
     pub data: Vec<SemanticSearchResult>,
     pub query: String,
