@@ -180,6 +180,8 @@ export type Settings = SettingsStore & {
 		address: string;
 		label?: string;
 	}>;
+	/** UI language preference */
+	language?: "en" | "ja";
 	/** Enable recording schedule — when on, recording only runs during defined time ranges */
 	scheduleEnabled?: boolean;
 	/** Per-day-of-week time ranges defining when recording is active */
@@ -343,6 +345,7 @@ let DEFAULT_SETTINGS: Settings = {
 			appendTypedTextToMeetingNotes: true,
 			localRetentionEnabled: true,
 			localRetentionDays: 14,
+			language: "en",
 		};
 
 export function createDefaultSettingsObject(): Settings {

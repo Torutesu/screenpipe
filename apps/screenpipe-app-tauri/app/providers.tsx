@@ -7,12 +7,22 @@ import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { useEffect, Suspense } from "react";
 import { ChangelogDialogProvider } from "@/lib/hooks/use-changelog-dialog";
-import { SettingsProvider } from "@/lib/hooks/use-settings";
+import { SettingsProvider, useSettings } from "@/lib/hooks/use-settings";
+import { TranslationProvider, Locale } from "@/lib/i18n";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PermissionMonitorProvider } from "@/lib/hooks/use-permission-monitor";
 import { forwardRef } from "react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { invoke } from "@tauri-apps/api/core";
+
+function I18nWrapper({ children }: { children: React.ReactNode }) {
+  const { settings } = useSettings();
+  return (
+    <TranslationProvider locale={(settings.language ?? "en") as Locale}>
+      {children}
+    </TranslationProvider>
+  );
+}
 
 export const Providers = forwardRef<
   HTMLDivElement,
@@ -109,6 +119,7 @@ export const Providers = forwardRef<
     <Suspense>
     <NuqsAdapter>
       <SettingsProvider>
+        <I18nWrapper>
         <ThemeProvider defaultTheme="system" storageKey="screenpipe-ui-theme">
           <ChangelogDialogProvider>
             <PermissionMonitorProvider>
@@ -116,6 +127,7 @@ export const Providers = forwardRef<
             </PermissionMonitorProvider>
           </ChangelogDialogProvider>
         </ThemeProvider>
+        </I18nWrapper>
       </SettingsProvider>
     </NuqsAdapter>
     </Suspense>
