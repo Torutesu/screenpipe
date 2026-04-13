@@ -30,7 +30,7 @@ The easiest way to use screenpipe-mcp is with npx. Edit your Claude Desktop conf
 
 ### Option 2: HTTP Server (Remote / Network Access)
 
-The MCP server can run over HTTP using the [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http), allowing remote MCP clients to connect over the network instead of stdio. This is ideal when your AI assistant (e.g., OpenClaw) runs on a different machine than screenpipe.
+The MCP server can run over HTTP using the [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http), allowing remote MCP clients to connect over the network instead of stdio. This is ideal when your AI assistant (e.g., OpenClaw) runs on a different machine than SHOGUN.
 
 ```bash
 # from npm
@@ -48,7 +48,7 @@ The server exposes:
 | Flag | Description | Default |
 |------|-------------|---------|
 | `--port` | Port for the MCP HTTP server | 3031 |
-| `--screenpipe-port` | Port where screenpipe API is running | 3030 |
+| `--screenpipe-port` | Port where SHOGUN API is running | 3030 |
 
 **Connecting a remote MCP client:**
 
@@ -64,7 +64,7 @@ Point any MCP client that supports HTTP transport at the `/mcp` endpoint:
 }
 ```
 
-If your machines are on different networks, expose port 3031 via Tailscale, SSH tunnel, or similar — see the [OpenClaw integration guide](https://docs.screenpi.pe/openclaw) for detailed examples.
+If your machines are on different networks, expose port 3031 via Tailscale, SSH tunnel, or similar — see the [OpenClaw integration guide](https://docs.syogun.com/openclaw) for detailed examples.
 
 > **Note:** The HTTP server currently exposes `search_content` only. The stdio server has the full tool set (export-video, list-meetings, activity-summary, search-elements, frame-context). We're working on bringing HTTP to full parity.
 
@@ -73,7 +73,7 @@ If your machines are on different networks, expose port 3031 via Tailscale, SSH 
 Clone and build from source:
 
 ```bash
-git clone https://github.com/screenpipe/screenpipe
+git clone https://github.com/select-kk/screenpipe
 cd screenpipe/crates/screenpipe-integrations/screenpipe-mcp
 npm install
 npm run build
@@ -156,7 +156,7 @@ Get accessibility text, parsed tree nodes, and extracted URLs for a specific fra
 
 ## Requirements
 
-- screenpipe must be running on localhost:3030
+- SHOGUN must be running on localhost:3030
 - Node.js >= 18.0.0
 
 ## Notes

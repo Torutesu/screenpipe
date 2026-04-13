@@ -16,8 +16,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/screenpipe/screenpipe"
+    "url": "https://github.com/select-kk/screenpipe"
   },
   "license": "MIT",
-  "keywords": ["screenpipe", "screen-recording", "ai", "memory", "cli"]
+  "keywords": ["shogun", "screen-recording", "ai", "memory", "cli"]
 }
