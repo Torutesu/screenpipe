@@ -1,11 +1,11 @@
 
-# Screenpipe Design Guide
+# SHOGUN Design Guide
 
 ## Philosophy
 
-**"Black & White Geometric Minimalism"**
+**"Dark x Gold x Stealth"**
 
-No color. Sharp corners. Clean typography. Escher-inspired mathematical abstractions.
+Dark backgrounds. Gold accents. Clean typography. Precision without excess.
 
 ---
 
@@ -27,50 +27,49 @@ No color. Sharp corners. Clean typography. Escher-inspired mathematical abstract
 
 | Purpose | Font | Fallbacks |
 |---------|------|-----------|
-| **Headings (sans)** | Space Grotesk | system-ui, sans-serif |
-| **Body (serif)** | Crimson Text | Baskerville, Times New Roman, serif |
-| **Code (mono)** | IBM Plex Mono | monospace |
+| **Headings (sans)** | Helvetica Neue | Noto Sans JP, system-ui, sans-serif |
+| **Body (sans)** | Helvetica Neue | Noto Sans JP, system-ui, sans-serif |
+| **Code (mono)** | Geist Mono | monospace |
 
 ### Usage Patterns
 
-- **Headings**: Space Grotesk, lowercase preferred
-- **Body text**: Crimson Text for readability
-- **Code/technical**: IBM Plex Mono
-- **Buttons**: UPPERCASE with tracking-wide
+- **Headings**: Helvetica Neue, clean and direct
+- **Body text**: Helvetica Neue for readability, Noto Sans JP for Japanese characters
+- **Code/technical**: Geist Mono
+- **Buttons**: Uppercase with tracking-wide
 - **Labels**: lowercase, medium weight
 
 ---
 
 ## Colors
 
-### Palette: Grayscale Only
+### Palette: Dark x Gold x Stealth
 
-**Light Mode:**
-- Background: #FFFFFF (pure white)
-- Foreground: #000000 (pure black)
-- Muted: #666666 (40% gray)
-- Border: #CCCCCC (80% gray)
-
-**Dark Mode:**
-- Background: #000000 (pure black)
-- Foreground: #FFFFFF (pure white)
-- Muted: #999999 (60% gray)
-- Border: #333333 (20% gray)
+| Token | Hex | Usage |
+|-------|-----|-------|
+| **Background** | #0A0A0A | Main background (not pure black) |
+| **Card** | #141414 | Card and panel surfaces |
+| **Border** | #2A2A2A | Borders and dividers |
+| **Accent Gold** | #C9A84C | Primary accent, highlights, CTAs |
+| **Accent Red** | #C0392B | Destructive actions, critical alerts |
+| **Text Primary** | #FFFFFF | Headings, primary content |
+| **Text Secondary** | #999999 | Descriptions, secondary content |
+| **Text Tertiary** | #666666 | Disabled, placeholder |
 
 ### Text Hierarchy
 
-| Level | Light Mode | Dark Mode |
-|-------|------------|-----------|
-| Primary | #000000 | #FFFFFF |
-| Secondary | #666666 | #999999 |
-| Tertiary | #999999 | #666666 |
-| Disabled | #B3B3B3 | #4D4D4D |
+| Level | Color |
+|-------|-------|
+| Primary | #FFFFFF |
+| Secondary | #999999 |
+| Tertiary | #666666 |
+| Disabled | #4D4D4D |
 
-### Rule: NO COLOR
+### Accent Rules
 
-- No accent colors (no blue, red, green, etc.)
-- Status indicators use grayscale only
-- Success/warning/error differentiated by icons, shapes, not color
+- Gold (#C9A84C) for primary actions, active states, and highlights
+- Red (#C0392B) only for destructive or critical states
+- No other accent colors without explicit design approval
 
 ---
 
@@ -79,15 +78,16 @@ No color. Sharp corners. Clean typography. Escher-inspired mathematical abstract
 ### Border Radius
 
 ```
---radius: 0
+--radius-card: 8px
+--radius-button: 4px
 ```
 
-**All corners are sharp.** No rounded corners anywhere.
+Cards use 8px radius. Buttons and inputs use 4px radius.
 
 ### Borders
 
 - Width: 1px solid
-- Style: Sharp, binary (on/off)
+- Color: #2A2A2A
 - No gradients, no shadows
 
 ### Shadows
@@ -102,18 +102,20 @@ No color. Sharp corners. Clean typography. Escher-inspired mathematical abstract
 
 ```
 - Font: UPPERCASE, tracking-wide
-- Border: 1px solid
-- Corners: Sharp (0px radius)
+- Border: 1px solid #2A2A2A
+- Corners: 4px radius
 - Transition: 150ms
-- Hover: Color inversion
+- Hover: Gold accent highlight
+- Primary: Gold background (#C9A84C), dark text
 ```
 
 ### Cards
 
 ```
-- Border: 1px solid
+- Background: #141414
+- Border: 1px solid #2A2A2A
 - Shadow: None
-- Corners: Sharp
+- Corners: 8px radius
 - Padding: 24px (p-6)
 ```
 
@@ -121,17 +123,20 @@ No color. Sharp corners. Clean typography. Escher-inspired mathematical abstract
 
 ```
 - Style: Command-line aesthetic
-- Font: Monospace (IBM Plex Mono)
-- Border: 1px solid
+- Font: Monospace (Geist Mono)
+- Border: 1px solid #2A2A2A
+- Corners: 4px radius
 - Height: 40px (h-10)
-- Focus: Border color change
+- Focus: Gold border (#C9A84C)
 ```
 
 ### Dialogs
 
 ```
-- Border: 1px solid
+- Background: #141414
+- Border: 1px solid #2A2A2A
 - Shadow: None
+- Corners: 8px radius
 - Animation: 150ms fade
 - Title: lowercase
 ```
@@ -175,16 +180,17 @@ Do at least 10 iterations on your animations, at every turn criticise your own d
 
 When creating new UI components:
 
-- [ ] Using Space Grotesk for headings
-- [ ] Using Crimson Text for body (or IBM Plex Mono for technical)
-- [ ] 1px solid border
+- [ ] Using Helvetica Neue for headings and body
+- [ ] Using Geist Mono for code and technical content
+- [ ] 1px solid border (#2A2A2A)
 - [ ] No box shadows
-- [ ] 0px border radius (sharp corners)
-- [ ] Black, white, or gray only
+- [ ] 8px radius for cards, 4px for buttons/inputs
+- [ ] Dark background (#0A0A0A), card surface (#141414)
+- [ ] Gold (#C9A84C) for primary accents only
 - [ ] 150ms transitions
 - [ ] UPPERCASE for buttons, lowercase for titles
-- [ ] Hover state: color inversion
-- [ ] Focus ring: 1px solid with offset
+- [ ] Hover state: gold accent highlight
+- [ ] Focus ring: 1px solid gold with offset
 
 ---
 
@@ -198,4 +204,3 @@ When creating new UI components:
 | UI components | `screenpipe-app-tauri/components/ui/*.tsx` |
 
 ---
-
