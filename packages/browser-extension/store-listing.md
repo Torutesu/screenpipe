@@ -1,31 +1,31 @@
 # Chrome Web Store Listing
 
 ## Name
-Screenpipe Browser Bridge
+SHOGUN Browser Bridge
 
 ## Short Description (132 chars max)
-Connects your browser to Screenpipe for AI-powered web automation, data sync, and memory capture from authenticated pages.
+Connects your browser to SHOGUN for AI-powered web automation, data sync, and memory capture from authenticated pages.
 
 ## Detailed Description
-Screenpipe Browser Bridge connects your browser to the Screenpipe desktop app, enabling AI-powered pipes to interact with web pages you're logged into.
+SHOGUN Browser Bridge connects your browser to the SHOGUN desktop app, enabling AI-powered blades to interact with web pages you're logged into.
 
 HOW IT WORKS
-This extension connects to Screenpipe's local server (localhost:3030) via WebSocket. When a Screenpipe pipe needs to read data from a web page, it sends a request through the local server to this extension, which executes it in the browser tab where you're already authenticated.
+This extension connects to SHOGUN's local server (localhost:3030) via WebSocket. When a SHOGUN blade needs to read data from a web page, it sends a request through the local server to this extension, which executes it in the browser tab where you're already authenticated.
 
 USE CASES
-- Sync your ChatGPT and Claude conversation history into Screenpipe memories
+- Sync your ChatGPT and Claude conversation history into SHOGUN memories
 - Extract data from authenticated dashboards and internal tools
 - Automate web workflows triggered by your screen activity
 
 PRIVACY & SECURITY
 - All communication stays on localhost — no data is sent to external servers
-- The extension only activates when Screenpipe's local server is running
-- JavaScript execution is triggered only by your local Screenpipe pipes
+- The extension only activates when SHOGUN's local server is running
+- JavaScript execution is triggered only by your local SHOGUN blades
 - No tracking, no analytics, no data collection
-- Fully open source: https://github.com/screenpipe/screenpipe
+- Fully open source: https://github.com/select-kk/screenpipe
 
 REQUIREMENTS
-- Screenpipe desktop app (https://screenpi.pe) running on the same machine
+- SHOGUN desktop app (https://syogun.com) running on the same machine
 - Works with Chrome, Arc, Brave, Edge, and other Chromium browsers
 
 ## Category
@@ -35,10 +35,10 @@ Productivity
 English
 
 ## Privacy Policy URL
-https://screenpi.pe/privacy
+https://syogun.com/privacy
 
 ## Website
-https://screenpi.pe
+https://syogun.com
 
 ## Support URL
-https://github.com/screenpipe/screenpipe/issues
+https://github.com/select-kk/screenpipe/issues

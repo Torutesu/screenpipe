@@ -1,7 +1,7 @@
 {
   "name": "screenpipe",
   "version": "0.1.0",
-  "description": "screenpipe CLI — AI that knows everything you've seen, said, or heard",
+  "description": "SHOGUN CLI — AI that knows everything you've seen, said, or heard",
   "bin": {
     "screenpipe": "bin/screenpipe.js"
   },

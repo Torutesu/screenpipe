@@ -1,7 +1,7 @@
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=c3628864-a0cb-47a1-a822-2f936cff50b2" />
 
 <p align="center">
-   <a href ="https://screenpi.pe">
+   <a href ="https://syogun.com">
       <img src="https://github.com/user-attachments/assets/d3b1de26-c3c0-4c84-b9c4-b03213b97a30" alt="logo" width="200">
    </a>
 </p>
@@ -10,7 +10,7 @@
    <a href="README.md">English</a> | <a href="README-zh_CN.md">简体中文</a> | <a href="README-ja.md">日本語</a>
 </p>
 
-<h1 align="center">[ screenpipe ]</h1>
+<h1 align="center">[ SHOGUN ]</h1>
 
 
 <p align="center">桌面的 24/7 记忆</p>
@@ -19,22 +19,22 @@
 
 
 <p align="center">
-   <a href ="https://screenpi.pe">
+   <a href ="https://syogun.com">
       <img src="https://github.com/user-attachments/assets/c88d218e-40a7-405d-b419-eec1553ea287" alt="logo" width="800">
    </a>
 </p>
 
 <p align="center">
-    <a href="https://screenpi.pe" target="_blank">
+    <a href="https://syogun.com" target="_blank">
         <img src="https://img.shields.io/badge/下载-桌面应用-black?style=for-the-badge" alt="下载">
     </a>
-    <a href="https://github.com/screenpipe/screenpipe/raw/main/crates/screenpipe-integrations/screenpipe-mcp/screenpipe-mcp.mcpb" target="_blank">
+    <a href="https://github.com/select-kk/screenpipe/raw/main/crates/screenpipe-integrations/screenpipe-mcp/screenpipe-mcp.mcpb" target="_blank">
         <img src="https://img.shields.io/badge/安装-Claude%20扩展-D97706?style=for-the-badge&logo=anthropic&logoColor=white" alt="安装 claude 扩展">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://discord.gg/screenpipe">
+    <a href="https://discord.gg/shogun-ai">
         <img src="https://img.shields.io/discord/823813159592001537?color=5865F2&logo=discord&logoColor=white&style=flat-square" alt="discord">
     </a>
     <a href="https://twitter.com/screen_pipe">
@@ -52,7 +52,7 @@
 
 ## 这是什么？
 
-screenpipe 全天候录制你的屏幕和音频，所有数据存储在本地，让你将数字历史与 AI 连接起来。
+SHOGUN 全天候录制你的屏幕和音频，所有数据存储在本地，让你将数字历史与 AI 连接起来。
 
 ```
 ┌─────────────────────────────────────────┐
@@ -67,7 +67,7 @@ screenpipe 全天候录制你的屏幕和音频，所有数据存储在本地，
 
 ## 安装
 
-[下载桌面应用](https://screenpi.pe) — 支持 macOS、Windows、Linux
+[下载桌面应用](https://syogun.com) — 支持 macOS、Windows、Linux
 
 ## 配置要求
 
@@ -79,7 +79,7 @@ screenpipe 全天候录制你的屏幕和音频，所有数据存储在本地，
 ---
 
 <p align="center">
-    <a href="https://docs.screenpi.pe">文档</a> ·
-    <a href="https://discord.gg/screenpipe">discord</a> ·
+    <a href="https://docs.syogun.com">文档</a> ·
+    <a href="https://discord.gg/shogun-ai">discord</a> ·
     <a href="https://twitter.com/screen_pipe">x</a>
 </p>

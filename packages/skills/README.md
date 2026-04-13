@@ -1,8 +1,8 @@
 # @screenpipe/skills
 
-**Screenpipe skills for AI agents.**
+**SHOGUN skills for AI agents.**
 
-One-liner to install Screenpipe skills to your AI agent (OpenClaw, Claude Code, etc). Your agent can then query your screen history, get daily digests, and search memories.
+One-liner to install SHOGUN skills to your AI agent (OpenClaw, Claude Code, etc). Your agent can then query your screen history, get daily digests, and search memories.
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ bunx @screenpipe/skills list
 
 ## Requirements
 
-- [Screenpipe](https://screenpi.pe) installed and running
+- [SHOGUN](https://syogun.com) installed and running
 - Screen data synced to agent via `bunx @screenpipe/sync --daemon`
 - SQLite3 available on the agent
 
@@ -36,7 +36,7 @@ bunx @screenpipe/skills list
 
 ```bash
 # 1. Sync your screen data to the agent
-bunx @screenpipe/sync --daemon --remote openclaw:~/.screenpipe/
+bunx @screenpipe/sync --daemon --remote openclaw:~/.shogun/
 
 # 2. Install skills
 bunx @screenpipe/skills install --remote openclaw
@@ -49,7 +49,7 @@ bunx @screenpipe/skills install --remote openclaw
 
 ## How It Works
 
-Skills are markdown files that teach your AI agent how to query the Screenpipe SQLite database:
+Skills are markdown files that teach your AI agent how to query the SHOGUN SQLite database:
 
 ```sql
 -- Example: Get today's app usage
@@ -65,4 +65,4 @@ The agent reads these skill files and uses them to answer your questions about y
 
 ## License
 
-MIT - Part of [Screenpipe](https://github.com/screenpipe/screenpipe)
+MIT - Part of [SHOGUN](https://github.com/select-kk/screenpipe)

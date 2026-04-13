@@ -1,7 +1,7 @@
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=c3628864-a0cb-47a1-a822-2f936cff50b2" />
 
 <p align="center">
-   <a href ="https://screenpi.pe">
+   <a href ="https://syogun.com">
       <img src="https://github.com/user-attachments/assets/d3b1de26-c3c0-4c84-b9c4-b03213b97a30" alt="logo" width="200">
    </a>
 </p>
@@ -10,7 +10,7 @@
    <a href="README.md">English</a> | <a href="README-zh_CN.md">简体中文</a> | <a href="README-ja.md">日本語</a>
 </p>
 
-<h1 align="center">[ screenpipe ]</h1>
+<h1 align="center">[ SHOGUN ]</h1>
 
 
 <p align="center">デスクトップの24時間メモリー</p>
@@ -19,22 +19,22 @@
 
 
 <p align="center">
-   <a href ="https://screenpi.pe">
+   <a href ="https://syogun.com">
       <img src="https://github.com/user-attachments/assets/c88d218e-40a7-405d-b419-eec1553ea287" alt="logo" width="800">
    </a>
 </p>
 
 <p align="center">
-    <a href="https://screenpi.pe" target="_blank">
+    <a href="https://syogun.com" target="_blank">
         <img src="https://img.shields.io/badge/ダウンロード-デスクトップアプリ-black?style=for-the-badge" alt="ダウンロード">
     </a>
-    <a href="https://github.com/screenpipe/screenpipe/raw/main/crates/screenpipe-integrations/screenpipe-mcp/screenpipe-mcp.mcpb" target="_blank">
+    <a href="https://github.com/select-kk/screenpipe/raw/main/crates/screenpipe-integrations/screenpipe-mcp/screenpipe-mcp.mcpb" target="_blank">
         <img src="https://img.shields.io/badge/インストール-Claude%20拡張機能-D97706?style=for-the-badge&logo=anthropic&logoColor=white" alt="claude拡張機能をインストール">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://discord.gg/screenpipe">
+    <a href="https://discord.gg/shogun-ai">
         <img src="https://img.shields.io/discord/823813159592001537?color=5865F2&logo=discord&logoColor=white&style=flat-square" alt="discord">
     </a>
     <a href="https://twitter.com/screen_pipe">
@@ -52,7 +52,7 @@
 
 ## これは何？
 
-screenpipeは画面と音声を24時間365日録画し、すべてをローカルに保存し、デジタル履歴をAIに接続できます。
+SHOGUNは画面と音声を24時間365日録画し、すべてをローカルに保存し、デジタル履歴をAIに接続できます。
 
 ```
 ┌─────────────────────────────────────────┐
@@ -67,7 +67,7 @@ screenpipeは画面と音声を24時間365日録画し、すべてをローカ�
 
 ## インストール
 
-[デスクトップアプリをダウンロード](https://screenpi.pe) — macOS、Windows、Linux対応
+[デスクトップアプリをダウンロード](https://syogun.com) — macOS、Windows、Linux対応
 
 ## スペック
 
@@ -79,7 +79,7 @@ screenpipeは画面と音声を24時間365日録画し、すべてをローカ�
 ---
 
 <p align="center">
-    <a href="https://docs.screenpi.pe">ドキュメント</a> ·
-    <a href="https://discord.gg/screenpipe">discord</a> ·
+    <a href="https://docs.syogun.com">ドキュメント</a> ·
+    <a href="https://discord.gg/shogun-ai">discord</a> ·
     <a href="https://twitter.com/screen_pipe">x</a>
 </p>

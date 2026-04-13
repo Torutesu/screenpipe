@@ -1,4 +1,4 @@
-# Screenpipe MCP Server
+# SHOGUN MCP Server
 
 <a href="https://www.pulsemcp.com/servers/screenpipe-screenpipe"><img src="https://www.pulsemcp.com/badge/top-pick/screenpipe-screenpipe" width="400" alt="PulseMCP Badge"></a>
 
@@ -6,7 +6,7 @@
 
 https://github.com/user-attachments/assets/7466a689-7703-4f0b-b3e1-b1cb9ed70cff
 
-MCP server for screenpipe - search your screen recordings, audio transcriptions, and control your computer with AI.
+MCP server for SHOGUN - search your screen recordings, audio transcriptions, and control your computer with AI.
 
 ## Installation
 

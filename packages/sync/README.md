@@ -1,6 +1,6 @@
 # @screenpipe/sync
 
-**Sync your Screenpipe data to remote AI agents.**
+**Sync your SHOGUN data to remote AI agents.**
 
 One-liner to sync daily summaries to a remote server (e.g., [OpenClaw](https://github.com/openclaw/openclaw)). Uses Claude Code CLI for AI-powered extraction.
 
@@ -128,7 +128,7 @@ bunx @screenpipe/sync --stop
 
 ## How It Works
 
-1. **Query** - Fetches OCR data from local Screenpipe API
+1. **Query** - Fetches OCR data from local SHOGUN API
 2. **Dedupe** - Removes duplicate/similar screen captures
 3. **Extract** - Claude Code CLI analyzes for structured data
 4. **Format** - Outputs markdown or JSON
@@ -136,7 +136,7 @@ bunx @screenpipe/sync --stop
 
 ## Requirements
 
-- [Screenpipe](https://github.com/screenpipe/screenpipe) running locally
+- [SHOGUN](https://github.com/select-kk/screenpipe) running locally
 - [Bun](https://bun.sh) runtime
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (optional, for AI extraction)
 
@@ -146,4 +146,4 @@ All processing happens locally. Screen data never leaves your machine unless you
 
 ## License
 
-MIT - Part of the [Screenpipe](https://github.com/screenpipe/screenpipe) project.
+MIT - Part of the [SHOGUN](https://github.com/select-kk/screenpipe) project.

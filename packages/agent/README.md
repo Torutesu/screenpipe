@@ -1,8 +1,8 @@
 # @screenpipe/agent
 
-**One-liner to connect Screenpipe to your AI agent.**
+**One-liner to connect SHOGUN to your AI agent.**
 
-Set up full Screenpipe integration with any AI agent (OpenClaw, OpenClaw, etc.) in one command. Includes data sync, skills, and optional morning summaries.
+Set up full SHOGUN integration with any AI agent (OpenClaw, OpenClaw, etc.) in one command. Includes data sync, skills, and optional morning summaries.
 
 ## Quick Start
 
@@ -53,7 +53,7 @@ bunx @screenpipe/agent --remove user@server
 
 ## Requirements
 
-- [Screenpipe](https://screenpi.pe) running locally
+- [SHOGUN](https://syogun.com) running locally
 - SSH access to your agent server
 - AI agent that supports skills (OpenClaw, OpenClaw, etc.)
 
@@ -88,7 +88,7 @@ Good morning! Here's your briefing:
 ```
 Your Computer                    Your Agent Server
 ┌─────────────┐                  ┌─────────────────┐
-│  Screenpipe │ ──sync daemon──▶ │ ~/.screenpipe/  │
+│  SHOGUN     │ ──sync daemon──▶ │ ~/.shogun/      │
 │  (records)  │    (hourly)      │   db.sqlite     │
 └─────────────┘                  └────────┬────────┘
                                           │
@@ -110,4 +110,4 @@ Your Computer                    Your Agent Server
 
 ## License
 
-MIT - Part of [Screenpipe](https://github.com/screenpipe/screenpipe)
+MIT - Part of [SHOGUN](https://github.com/select-kk/screenpipe)

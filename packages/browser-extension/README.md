@@ -1,11 +1,11 @@
-# Screenpipe Browser Bridge
+# SHOGUN Browser Bridge
 
-Chrome/Chromium extension that connects your browser to Screenpipe, enabling pipes to execute JavaScript in browser tabs.
+Chrome/Chromium extension that connects your browser to SHOGUN, enabling blades to execute JavaScript in browser tabs.
 
 ## How it works
 
-1. Extension connects to Screenpipe's local server via WebSocket (`ws://localhost:3030/browser/ws`)
-2. Pipes send JS code via `POST /browser/eval`
+1. Extension connects to SHOGUN's local server via WebSocket (`ws://localhost:3030/browser/ws`)
+2. Blades send JS code via `POST /browser/eval`
 3. Extension executes the code in the matching tab using `chrome.scripting.executeScript`
 4. Results flow back through the same path
 
@@ -45,6 +45,6 @@ Response:
 
 ## Use cases
 
-- Sync ChatGPT/Claude conversation history into Screenpipe memories
+- Sync ChatGPT/Claude conversation history into SHOGUN memories
 - Scrape authenticated web pages (uses the browser's own cookies)
-- Automate web workflows from pipes
+- Automate web workflows from blades
