@@ -441,7 +441,7 @@ const OnboardingStatus: React.FC<OnboardingStatusProps> = ({
         transition={{ duration: 0.4 }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="w-12 h-12 mb-2" src="/128x128.png" alt="SHOGUN" />
+        <img className="w-12 h-12 mb-2" src="/shogun-logo.svg" alt="SHOGUN" />
         <h1 className="font-mono text-base font-bold text-foreground">SHOGUN</h1>
       </motion.div>
 

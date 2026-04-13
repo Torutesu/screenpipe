@@ -16,7 +16,7 @@ const SplashScreen: React.FC = () => {
           className="relative"
         >
           <motion.img
-            src="/128x128.png"
+            src="/shogun-logo.svg"
             alt="SHOGUN AI Logo"
             className="w-24 h-24"
             animate={{ 

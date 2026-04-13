@@ -278,7 +278,7 @@ function HomeContent() {
     if (isSectionHidden(activeSection) && activeSection !== "help") {
       return (
         <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-          <img src="/128x128.png" alt="SHOGUN AI" className="w-16 h-16 opacity-30 mb-4" />
+          <img src="/shogun-logo.svg" alt="SHOGUN AI" className="w-16 h-16 opacity-30 mb-4" />
           <p className="text-sm font-mono">SHOGUN</p>
         </div>
       );
@@ -297,7 +297,7 @@ function HomeContent() {
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-            <img src="/128x128.png" alt="SHOGUN AI" className="w-16 h-16 opacity-30 mb-4" />
+            <img src="/shogun-logo.svg" alt="SHOGUN AI" className="w-16 h-16 opacity-30 mb-4" />
             <p className="text-sm font-mono">SHOGUN</p>
           </div>
         );
