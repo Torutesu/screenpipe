@@ -32,16 +32,16 @@ export function DisplaySection() {
   };
 
   const themeOptions = [
-    { value: "system" as const, label: "System", icon: Monitor },
-    { value: "light" as const, label: "Light", icon: Sun },
-    { value: "dark" as const, label: "Dark", icon: Moon },
+    { value: "system" as const, label: t("settings.display.themeSystem"), icon: Monitor },
+    { value: "light" as const, label: t("settings.display.themeLight"), icon: Sun },
+    { value: "dark" as const, label: t("settings.display.themeDark"), icon: Moon },
   ];
 
 
   return (
     <div className="space-y-5">
       <p className="text-muted-foreground text-sm mb-4">
-        Theme, windows, and overlay appearance
+        {t("settings.display.description")}
       </p>
 
       <div className="space-y-2">
@@ -50,7 +50,7 @@ export function DisplaySection() {
             <div className="space-y-2.5">
               <div className="flex items-center space-x-2.5">
                 <Monitor className="h-4 w-4 text-muted-foreground shrink-0" />
-                <h3 className="text-sm font-medium text-foreground">Theme</h3>
+                <h3 className="text-sm font-medium text-foreground">{t("settings.display.theme")}</h3>
               </div>
               <div className="flex gap-3 ml-[26px]">
                 {themeOptions.map((option) => {
@@ -128,16 +128,16 @@ export function DisplaySection() {
                 <Layers className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div>
                   <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
-                    Timeline Mode
-                    <HelpTooltip text="Controls how the timeline overlay appears. 'Native' uses a system overlay, 'Tauri' uses the app window." />
+                    {t("settings.display.timelineMode")}
+                    <HelpTooltip text={t("settings.display.timelineModeDesc")} />
                   </h3>
-                  <p className="text-xs text-muted-foreground">Reopen timeline to apply</p>
+                  <p className="text-xs text-muted-foreground">{t("settings.display.reopenTimeline")}</p>
                 </div>
               </div>
               <div className="flex gap-2 ml-[26px]">
                 {([
-                  { value: "fullscreen", label: "Overlay", desc: "Floating panel" },
-                  { value: "window", label: "Window", desc: "Resizable window" },
+                  { value: "fullscreen", label: t("settings.display.overlay"), desc: t("settings.display.floatingPanel") },
+                  { value: "window", label: t("settings.display.window"), desc: t("settings.display.resizableWindow") },
                 ]).map((option) => {
                   const isActive = (settings?.overlayMode ?? "fullscreen") === option.value;
                   return (
