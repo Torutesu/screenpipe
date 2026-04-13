@@ -56,8 +56,22 @@ impl TextEmbedder {
             .commit_from_file(&model_path)
             .context("failed to load ONNX model file")?;
 
-        let tokenizer = Tokenizer::from_file(&tokenizer_path)
+        let mut tokenizer = Tokenizer::from_file(&tokenizer_path)
             .map_err(|e| anyhow::anyhow!("failed to load tokenizer: {}", e))?;
+
+        // Enforce truncation to MAX_TOKENS so long texts don't exceed model limits.
+        tokenizer
+            .with_truncation(Some(tokenizers::TruncationParams {
+                max_length: MAX_TOKENS,
+                ..Default::default()
+            }))
+            .map_err(|e| anyhow::anyhow!("failed to set truncation: {}", e))?;
+
+        // Pad to longest in the batch (dynamic padding).
+        tokenizer.with_padding(Some(tokenizers::PaddingParams {
+            strategy: tokenizers::PaddingStrategy::BatchLongest,
+            ..Default::default()
+        }));
 
         info!("text embedder loaded successfully");
 
