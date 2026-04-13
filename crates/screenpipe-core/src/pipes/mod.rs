@@ -15,6 +15,7 @@ pub mod preset_fallback;
 pub mod sync;
 
 use crate::agents::{
+    claude_code::ClaudeCodeExecutor,
     pi::{PiExecutor, SCREENPIPE_API_URL},
     AgentExecutor, ExecutionHandle,
 };
@@ -1720,7 +1721,7 @@ impl PipeManager {
             }
         });
 
-        // Pre-configure pi
+        // Pre-configure agent
         let mut pipe_token: Option<String> = None;
         if config.agent == "pi" {
             if let Err(e) = PiExecutor::ensure_pi_config(
@@ -1735,6 +1736,20 @@ impl PipeManager {
 
             pipe_token =
                 setup_pipe_permissions(&pipe_dir, &config, self.token_registry.as_ref()).await;
+        } else if config.agent == "claude-code" {
+            let api_url = format!("http://localhost:{}", self.api_port);
+            pipe_token =
+                setup_pipe_permissions(&pipe_dir, &config, self.token_registry.as_ref()).await;
+
+            if let Err(e) = ClaudeCodeExecutor::ensure_screenpipe_claude_md(
+                &pipe_dir,
+                &api_url,
+                pipe_token.as_deref(),
+            ) {
+                warn!("failed to write screenpipe CLAUDE.md: {}", e);
+            }
+
+            ClaudeCodeExecutor::ensure_mcp_config(&pipe_dir);
         }
         let token_registry_ref = self.token_registry.clone();
 
@@ -2193,7 +2208,7 @@ impl PipeManager {
                 }
             });
 
-            // Pre-configure pi with the pipe's provider so models.json has the
+            // Pre-configure agent with the pipe's provider so models.json has the
             // right entry before the agent subprocess starts.
             let mut pipe_token: Option<String> = None;
             if config.agent == "pi" {
@@ -2213,6 +2228,25 @@ impl PipeManager {
                     self.token_registry.as_ref(),
                 )
                 .await;
+            } else if config.agent == "claude-code" {
+                let api_url = format!("http://localhost:{}", self.api_port);
+                let pipe_dir = self.pipes_dir.join(name);
+                pipe_token = setup_pipe_permissions(
+                    &pipe_dir,
+                    &config,
+                    self.token_registry.as_ref(),
+                )
+                .await;
+
+                if let Err(e) = ClaudeCodeExecutor::ensure_screenpipe_claude_md(
+                    &pipe_dir,
+                    &api_url,
+                    pipe_token.as_deref(),
+                ) {
+                    warn!("failed to write screenpipe CLAUDE.md: {}", e);
+                }
+
+                ClaudeCodeExecutor::ensure_mcp_config(&pipe_dir);
             }
 
             // Run with timeout + streaming

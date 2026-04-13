@@ -384,6 +384,25 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: "semantic-search",
+    description:
+      "Semantic (meaning-based) search across screen text and audio transcriptions. Use when exact keywords are unknown or you need conceptual matching. Example: 'discussion about quarterly revenue' finds content about Q3 earnings even if those exact words aren't used. Requires start_time.",
+    annotations: { title: "Semantic Search", readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    inputSchema: {
+      type: "object",
+      properties: {
+        q: { type: "string", description: "Natural language query describing what you're looking for" },
+        content_type: { type: "string", enum: ["all", "ocr", "audio"], default: "all", description: "Content type to search" },
+        limit: { type: "integer", default: 10, description: "Max results to return" },
+        start_time: { type: "string", description: "ISO 8601 UTC start time or relative (e.g. '2h ago')" },
+        end_time: { type: "string", description: "ISO 8601 UTC end time or relative" },
+        app_name: { type: "string", description: "Filter by application name" },
+        threshold: { type: "number", default: 0.75, description: "Cosine distance threshold (0-1, lower = more similar)" },
+      },
+      required: ["q", "start_time"],
+    },
+  },
+  {
     name: "get-frame-elements",
     description:
       "Get all UI elements for a specific frame. More targeted than search-elements when you already have a frame_id.",
@@ -1326,6 +1345,34 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const results = data.data || [];
         if (results.length === 0) {
           return { content: [{ type: "text", text: "No keyword search results found." }] };
+        }
+        const formatted = results.map((r: Record<string, unknown>) => {
+          const content = r.content as Record<string, unknown> | undefined;
+          return `[${r.type}] ${content?.app_name || "?"} | ${content?.timestamp || ""}\n${content?.text || content?.transcription || ""}`;
+        });
+        return {
+          content: [{ type: "text", text: `Results: ${results.length}\n\n${formatted.join("\n---\n")}` }],
+        };
+      }
+
+      case "semantic-search": {
+        const params = new URLSearchParams();
+        for (const [key, value] of Object.entries(args)) {
+          if (value !== null && value !== undefined) {
+            params.append(key, String(value));
+          }
+        }
+        const response = await fetchAPI(`/search/semantic?${params.toString()}`);
+        if (response.status === 503) {
+          return {
+            content: [{ type: "text", text: "Embedding model is still loading. Please try again in a few seconds." }],
+          };
+        }
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        const data = await response.json();
+        const results = data.data || [];
+        if (results.length === 0) {
+          return { content: [{ type: "text", text: "No semantic search results found. Try: broader query, different content_type, or wider time range." }] };
         }
         const formatted = results.map((r: Record<string, unknown>) => {
           const content = r.content as Record<string, unknown> | undefined;
