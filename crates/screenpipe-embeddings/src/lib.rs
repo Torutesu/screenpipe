@@ -4,7 +4,7 @@
 
 use anyhow::{Context, Result};
 use ndarray::{Array2, Axis};
-use ort::session::Session;
+use ort::Session;
 use tokenizers::Tokenizer;
 use tracing::{debug, info};
 
