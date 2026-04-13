@@ -181,6 +181,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={isSearch ? "bg-transparent" : ""}>
       <head>
+        <title>SHOGUN AI</title>
+        <meta name="description" content="Work Memory + Always-on Agent. Built by Select KK." />
+        <meta property="og:title" content="SHOGUN AI" />
+        <meta property="og:description" content="Work Memory + Always-on Agent. Built by Select KK." />
         <script
           dangerouslySetInnerHTML={{
             __html: `

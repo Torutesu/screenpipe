@@ -1,3 +1,6 @@
+/* SHOGUN AI — Work Memory + Always-on Agent */
+/* https://syogun.com */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,41 +8,42 @@
 @layer base {
   :root {
     /*
-     * Screenpipe Brand Style Guide
-     * Black & White Geometric Minimalism
-     * No color. Sharp corners. Monospace typography.
+     * SHOGUN AI Brand Style Guide
+     * Dark-first design with gold accent
+     * Display: Helvetica Neue / Noto Sans JP
+     * Body/Code: Geist Mono / JetBrains Mono
      */
 
-    /* Base colors - Pure B&W */
-    --background: 0 0% 100%; /* #FFFFFF */
-    --foreground: 0 0% 0%; /* #000000 */
+    /* Base colors - Light mode */
+    --background: 0 0% 98%; /* #FAFAFA */
+    --foreground: 0 0% 4%; /* #0A0A0A */
 
-    /* Surface colors - Limited grays */
+    /* Surface colors */
     --surface: 0 0% 96%; /* ~#F5F5F5 */
     --surface-secondary: 0 0% 93%; /* ~#EDEDED */
     --surface-tertiary: 0 0% 90%; /* ~#E5E5E5 */
 
     /* Card colors */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --card-hover: 0 0% 0%; /* Invert on hover */
+    --card-foreground: 0 0% 4%;
+    --card-hover: 0 0% 4%; /* Invert on hover */
 
     /* Popover colors */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 0 0% 4%;
 
-    /* Primary - Pure black */
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 0 0% 20%;
-    --primary-muted: 0 0% 90%;
+    /* Primary - SHOGUN gold */
+    --primary: 43 53% 54%; /* #C9A84C */
+    --primary-foreground: 0 0% 4%; /* #0A0A0A */
+    --primary-hover: 43 53% 44%;
+    --primary-muted: 43 30% 90%;
 
     /* Secondary - Gray */
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary-foreground: 0 0% 4%;
     --secondary-hover: 0 0% 90%;
 
-    /* Status colors - Grayscale only */
+    /* Status colors */
     --success: 0 0% 20%;
     --success-foreground: 0 0% 100%;
     --success-muted: 0 0% 90%;
@@ -48,10 +52,10 @@
     --warning-foreground: 0 0% 100%;
     --warning-muted: 0 0% 85%;
 
-    --destructive: 0 0% 0%;
+    --destructive: 6 63% 46%; /* #C0392B */
     --destructive-foreground: 0 0% 100%;
-    --destructive-hover: 0 0% 20%;
-    --destructive-muted: 0 0% 90%;
+    --destructive-hover: 6 63% 36%;
+    --destructive-muted: 6 30% 90%;
 
     --info: 0 0% 40%;
     --info-foreground: 0 0% 100%;
@@ -63,79 +67,79 @@
 
     /* Accent colors */
     --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: 43 53% 54%; /* SHOGUN gold */
     --accent-hover: 0 0% 90%;
 
-    /* Border and input - 1px black/gray */
-    --border: 0 0% 80%;
+    /* Border and input */
+    --border: 0 0% 90%; /* #E5E5E5 */
     --input: 0 0% 100%;
-    --input-focus: 0 0% 0%;
-    --ring: 0 0% 0%;
+    --input-focus: 43 53% 54%; /* gold focus */
+    --ring: 43 53% 54%; /* gold ring */
 
-    /* Text colors - B&W hierarchy */
-    --text-primary: 0 0% 0%;
+    /* Text colors */
+    --text-primary: 0 0% 4%;
     --text-secondary: 0 0% 40%; /* #666666 */
     --text-tertiary: 0 0% 60%; /* #999999 */
     --text-disabled: 0 0% 70%;
 
-    /* Brand colors - All black for B&W aesthetic */
-    --brand-1: 0 0% 0%;
-    --brand-2: 0 0% 20%;
-    --brand-3: 0 0% 40%;
+    /* Brand colors - SHOGUN gold spectrum */
+    --brand-1: 43 53% 54%;
+    --brand-2: 43 53% 44%;
+    --brand-3: 43 40% 40%;
     --brand-4: 0 0% 60%;
     --brand-5: 0 0% 80%;
 
-    --color-1: 0 0% 0%;
-    --color-2: 0 0% 20%;
-    --color-3: 0 0% 40%;
+    --color-1: 43 53% 54%;
+    --color-2: 43 53% 44%;
+    --color-3: 43 40% 40%;
     --color-4: 0 0% 60%;
     --color-5: 0 0% 80%;
 
     /* Sidebar colors */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 0 0% 0%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-foreground: 0 0% 4%;
+    --sidebar-primary: 43 53% 54%;
+    --sidebar-primary-foreground: 0 0% 4%;
     --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 0 0% 80%;
-    --sidebar-ring: 0 0% 0%;
+    --sidebar-accent-foreground: 43 53% 54%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 43 53% 54%;
 
-    /* Sharp corners - no radius */
-    --radius: 0;
+    /* Rounded corners - SHOGUN cards 8px */
+    --radius: 0.5rem;
   }
 
   .dark {
-    /* Base colors - Slightly lifted black */
-    --background: 0 0% 7%; /* #121212 */
+    /* Base colors - SHOGUN near-black */
+    --background: 0 0% 4%; /* #0A0A0A */
     --foreground: 0 0% 100%; /* #FFFFFF */
 
     /* Surface colors */
-    --surface: 0 0% 10%;
+    --surface: 0 0% 10%; /* #1A1A1A */
     --surface-secondary: 0 0% 13%;
-    --surface-tertiary: 0 0% 16%;
+    --surface-tertiary: 0 0% 16%; /* #2A2A2A */
 
     /* Card colors */
-    --card: 0 0% 9%;
+    --card: 0 0% 8%; /* #141414 */
     --card-foreground: 0 0% 100%;
-    --card-hover: 0 0% 100%; /* Invert on hover */
+    --card-hover: 0 0% 12%;
 
     /* Popover colors */
-    --popover: 0 0% 10%;
+    --popover: 0 0% 8%; /* #141414 */
     --popover-foreground: 0 0% 100%;
 
-    /* Primary - Pure white */
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
-    --primary-hover: 0 0% 80%;
-    --primary-muted: 0 0% 15%;
+    /* Primary - SHOGUN gold */
+    --primary: 43 53% 54%; /* #C9A84C */
+    --primary-foreground: 0 0% 4%; /* #0A0A0A */
+    --primary-hover: 43 53% 64%;
+    --primary-muted: 43 30% 15%;
 
     /* Secondary */
-    --secondary: 0 0% 14%;
+    --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 0 0% 18%;
+    --secondary-hover: 0 0% 14%;
 
-    /* Status colors - Grayscale */
+    /* Status colors */
     --success: 0 0% 80%;
     --success-foreground: 0 0% 0%;
     --success-muted: 0 0% 15%;
@@ -144,29 +148,29 @@
     --warning-foreground: 0 0% 0%;
     --warning-muted: 0 0% 15%;
 
-    --destructive: 0 0% 100%;
-    --destructive-foreground: 0 0% 0%;
-    --destructive-hover: 0 0% 80%;
-    --destructive-muted: 0 0% 15%;
+    --destructive: 6 63% 46%; /* #C0392B */
+    --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 6 63% 56%;
+    --destructive-muted: 6 30% 15%;
 
     --info: 0 0% 60%;
     --info-foreground: 0 0% 0%;
     --info-muted: 0 0% 15%;
 
     /* Muted colors */
-    --muted: 0 0% 14%;
+    --muted: 0 0% 10%; /* #1A1A1A */
     --muted-foreground: 0 0% 60%; /* #999999 */
 
     /* Accent colors */
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 100%;
-    --accent-hover: 0 0% 18%;
+    --accent: 0 0% 10%; /* #1A1A1A */
+    --accent-foreground: 43 53% 54%; /* #C9A84C gold */
+    --accent-hover: 0 0% 14%;
 
     /* Border and input */
-    --border: 0 0% 22%;
-    --input: 0 0% 10%;
-    --input-focus: 0 0% 100%;
-    --ring: 0 0% 100%;
+    --border: 0 0% 16%; /* #2A2A2A */
+    --input: 0 0% 8%;
+    --input-focus: 43 53% 54%; /* gold focus */
+    --ring: 43 53% 54%; /* gold ring */
 
     /* Text colors */
     --text-primary: 0 0% 100%;
@@ -174,28 +178,28 @@
     --text-tertiary: 0 0% 40%; /* #666666 */
     --text-disabled: 0 0% 30%;
 
-    /* Brand colors */
-    --brand-1: 0 0% 100%;
-    --brand-2: 0 0% 80%;
-    --brand-3: 0 0% 60%;
+    /* Brand colors - SHOGUN gold spectrum */
+    --brand-1: 43 53% 54%;
+    --brand-2: 43 53% 64%;
+    --brand-3: 43 40% 40%;
     --brand-4: 0 0% 40%;
     --brand-5: 0 0% 20%;
 
-    --color-1: 0 0% 100%;
-    --color-2: 0 0% 80%;
-    --color-3: 0 0% 60%;
+    --color-1: 43 53% 54%;
+    --color-2: 43 53% 64%;
+    --color-3: 43 40% 40%;
     --color-4: 0 0% 40%;
     --color-5: 0 0% 20%;
 
     /* Sidebar colors */
-    --sidebar-background: 0 0% 5%;
+    --sidebar-background: 0 0% 3%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 0 0% 14%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 22%;
-    --sidebar-ring: 0 0% 100%;
+    --sidebar-primary: 43 53% 54%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 43 53% 54%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 43 53% 54%;
   }
 }
 
@@ -300,7 +304,7 @@
   .selectable-text-layer *::selection,
   .prose::selection,
   .prose *::selection {
-    background-color: rgba(59, 130, 246, 0.35) !important;
+    background-color: rgba(201, 168, 76, 0.35) !important;
   }
 
   /* Allow video/audio controls to work normally */
@@ -533,5 +537,11 @@
 
 .dark .pf-v5-c-text-input-group__text-input::placeholder {
   color: hsl(var(--muted-foreground)) !important;
+}
+
+/* SHOGUN dot grid background texture */
+.dot-grid {
+  background-image: radial-gradient(circle, #2A2A2A 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 

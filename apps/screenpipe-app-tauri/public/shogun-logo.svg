@@ -1,0 +1,8 @@
+<!-- SHOGUN AI Logo — 将軍 Kamon Style -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect width="100" height="100" rx="12" fill="#0A0A0A"/>
+  <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" fill="none" stroke="#C9A84C" stroke-width="3"/>
+  <line x1="50" y1="25" x2="50" y2="75" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+  <line x1="32" y1="40" x2="68" y2="40" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+  <line x1="32" y1="55" x2="68" y2="55" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+</svg>

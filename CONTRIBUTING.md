@@ -1,13 +1,13 @@
-# contributing to screen pipe
+# contributing to SHOGUN
 
-first off, thank you for considering contributing to screen pipe!
+first off, thank you for considering contributing to SHOGUN!
 
 btw, we prefer that you don't contribute if you are not using or will use the product and is just there for bounties, thank you.
 
 ## getting started
 
 before you begin:
-- try to run the [pre-built app](https://docs.screenpi.pe) to get familiar with the project
+- try to run the [pre-built app](https://docs.syogun.com) to get familiar with the project
 - familiarize yourself with the project structure and architecture.
 
 ## installation and build guide
@@ -32,8 +32,8 @@ before you begin:
 
 3. **clone the repository**:
    ```bash
-   git clone https://github.com/screenpipe/screenpipe
-   cd screenpipe
+   git clone https://github.com/select-kk/shogun
+   cd shogun
    ```
 
 4. **build the project**:
@@ -41,7 +41,7 @@ before you begin:
    cargo build --release --features metal,apple-intelligence
    ```
 
-5. **run screenpipe**:
+5. **run shogun**:
    ```bash
    ./target/release/screenpipe
    ```
@@ -79,12 +79,11 @@ before you begin:
 
 4. **clone the project**:
    ```powershell
-      git clone https://github.com/screenpipe/screenpipe.git
-      cd screenpipe
+      git clone https://github.com/select-kk/shogun.git
+      cd shogun
    ```
 5. **build**:
    ```powershell
-   cd screenpipe
    cargo build --release
    cd apps/screenpipe-app-tauri
    bun install
@@ -112,8 +111,8 @@ before you begin:
 
 4. **clone and build**:
    ```bash
-   git clone https://github.com/screenpipe/screenpipe
-   cd screenpipe
+   git clone https://github.com/select-kk/shogun
+   cd shogun
    cargo build --release
    ```
 
@@ -138,7 +137,7 @@ before you begin:
 
 ### reporting bugs
 
-this section guides you through submitting a bug report for screen pipe. following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
+this section guides you through submitting a bug report for SHOGUN. following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
 
 - use a clear and descriptive title for the issue to identify the problem.
 - describe the exact steps which reproduce the problem in as many details as possible.
@@ -146,11 +145,11 @@ this section guides you through submitting a bug report for screen pipe. followi
 
 ### suggesting enhancements
 
-this section guides you through submitting an enhancement suggestion for screen pipe, including completely new features and minor improvements to existing functionality.
+this section guides you through submitting an enhancement suggestion for SHOGUN, including completely new features and minor improvements to existing functionality.
 
 - use a clear and descriptive title for the issue to identify the suggestion.
 - provide a step-by-step description of the suggested enhancement in as many details as possible.
-- explain why this enhancement would be useful to most screen pipe users.
+- explain why this enhancement would be useful to most SHOGUN users.
 
 ### pull requests
 
@@ -267,7 +266,7 @@ then open the file in `target/release/instruments` using xcode -> open developer
 cargo bench
 ```
 
-[check benchmark visuals](https://screenpipe.github.io/screenpipe/dev/bench/)
+[check benchmark visuals](https://select-kk.github.io/shogun/dev/bench/)
 
 ### creating new migrations
 
@@ -282,17 +281,17 @@ if you encounter errors with missing migrations (e.g., `migration XXXXXXXXXX was
 
 ```bash
 # remove specific migration
-sqlite3 ~/.screenpipe/db.sqlite "DELETE FROM _sqlx_migrations WHERE version = XXXXXXXXXX;"
+sqlite3 ~/.shogun/db.sqlite "DELETE FROM _sqlx_migrations WHERE version = XXXXXXXXXX;"
 
 # verify migrations
-sqlite3 ~/.screenpipe/db.sqlite "SELECT * FROM _sqlx_migrations;"
+sqlite3 ~/.shogun/db.sqlite "SELECT * FROM _sqlx_migrations;"
 
 # if issues persist, you can take the nuclear approach:
 # 1. backup your database
-cp ~/.screenpipe/db.sqlite ~/.screenpipe/db.sqlite.backup
+cp ~/.shogun/db.sqlite ~/.shogun/db.sqlite.backup
 
 # 2. reset migrations table
-sqlite3 ~/.screenpipe/db.sqlite "DROP TABLE _sqlx_migrations;"
+sqlite3 ~/.shogun/db.sqlite "DROP TABLE _sqlx_migrations;"
 ```
 
 ### set up azure ubuntu vm with display & audio
@@ -363,11 +362,11 @@ az vm user update \
   --password <new-password>
 ```
 
-now you can either dev screenpipe on linux or run screenpipe in the cloud that record your local macos. make sure to configure microsoft remote desktop to forward audio
+now you can either dev shogun on linux or run shogun in the cloud that record your local macos. make sure to configure microsoft remote desktop to forward audio
 
 ## generating openapi.yaml
 
-run screenpipe first and then go to http://localhost:3030/openapi.yaml
+run shogun first and then go to http://localhost:3030/openapi.yaml
 
 ```bash
 open http://localhost:3030/openapi.yaml
@@ -398,9 +397,9 @@ to validate the openapi.yaml file is valid btw before pushing
 
 ## join the community
 
-say 👋 in our [public discord channel](https://discord.gg/screenpipe). we discuss how to bring this lib to production, help each other with contributions, personal projects or just hang out ☕.
+say hi in our [community Discord](https://discord.gg/shogunai). we discuss how to bring this to production, help each other with contributions, personal projects or just hang out.
 
-thank you for contributing to screen pipe! 🎉
+thank you for contributing to SHOGUN!
 
 ## testing
 

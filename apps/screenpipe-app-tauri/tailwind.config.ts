@@ -1,3 +1,6 @@
+/* SHOGUN AI — Work Memory + Always-on Agent */
+/* https://syogun.com */
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
@@ -18,9 +21,9 @@ module.exports = {
 	  },
 	  extend: {
 		fontFamily: {
-		  /* Screenpipe Brand: Monospace primary */
-		  sans: ["JetBrains Mono", "SF Mono", "IBM Plex Mono", "ui-monospace", "monospace"],
-		  mono: ["JetBrains Mono", "SF Mono", "IBM Plex Mono", "ui-monospace", "monospace"],
+		  /* SHOGUN AI: Display/Heading sans-serif, Body/Code monospace */
+		  sans: ["Helvetica Neue", "Noto Sans JP", "sans-serif"],
+		  mono: ["Geist Mono", "JetBrains Mono", "monospace"],
 		},
 		colors: {
 		  // Base colors
@@ -127,6 +130,13 @@ module.exports = {
 			5: "hsl(var(--brand-5))",
 		  },
 		  
+		  // SHOGUN semantic tokens
+		  shogun: {
+			gold: "#C9A84C",
+			red: "#C0392B",
+			label: "#F5F5F5",
+		  },
+
 		  // Legacy color mappings for backward compatibility
 		  "color-1": "hsl(var(--brand-1))",
 		  "color-2": "hsl(var(--brand-2))",
