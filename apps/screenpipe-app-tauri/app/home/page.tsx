@@ -307,7 +307,7 @@ function HomeContent() {
   // Top-level nav items (filtered by enterprise policy)
   const mainSections = [
     { id: "home", label: "Home", icon: <Home className="h-4 w-4" /> },
-    { id: "pipes", label: "Pipes", icon: <Workflow className="h-4 w-4" /> },
+    { id: "pipes", label: "Blades", icon: <Workflow className="h-4 w-4" /> },
     { id: "timeline", label: "Timeline", icon: <Clock className="h-4 w-4" /> },
     { id: "memories", label: "Memories", icon: <Sparkles className="h-4 w-4" /> },
   ].filter((s) => !isSectionHidden(s.id));

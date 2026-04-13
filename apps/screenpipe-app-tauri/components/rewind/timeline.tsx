@@ -1282,8 +1282,8 @@ export default function Timeline({ embedded = false }: { embedded?: boolean }) {
 								<h3 className="font-medium text-destructive">Connection Error</h3>
 							</div>
 							<p className="text-sm text-foreground">
-								Unable to reach your screenpipe data. Please verify that the
-								screenpipe turned on.
+								Unable to reach your SHOGUN data. Please verify that
+								SHOGUN is turned on.
 							</p>
 							<button
 								onClick={handleRefresh}

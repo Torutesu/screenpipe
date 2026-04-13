@@ -94,7 +94,7 @@ export function UpdateBanner({ className, compact = false }: UpdateBannerProps) 
         try {
           await invoke("stop_screenpipe");
         } catch (e) {
-          console.warn("failed to stop screenpipe:", e);
+          console.warn("failed to stop SHOGUN:", e);
         }
 
         // Get or check for the update

@@ -728,7 +728,7 @@ export function PipeMonitorView() {
             </p>
             <p className="text-xs text-muted-foreground mb-4">
               {discovering
-                ? "checking tailscale peers and SSH hosts for screenpipe instances"
+                ? "checking tailscale peers and SSH hosts for SHOGUN instances"
                 : "scan your network or add a device manually"}
             </p>
             {discovering ? (

@@ -32,7 +32,7 @@ const getDebuggingCommands = (os: string | null, dataDir: string) => {
       "# 1. Open Command Prompt as admin (search for 'cmd' in the Start menu, right click, 'Run as admin')\n# 2. Navigate to: %LOCALAPPDATA%\\screenpipe\\\n#    Type: cd %LOCALAPPDATA%\\screenpipe\n";
   } else if (os === "macos") {
     cliInstructions =
-      "# 1. Open Terminal\n# 2. Navigate to: /Applications/screenpipe.app/Contents/MacOS/\n#    Type: cd /Applications/screenpipe.app/Contents/MacOS/\n";
+      "# 1. Open Terminal\n# 2. Navigate to: /Applications/SHOGUN.app/Contents/MacOS/\n#    Type: cd /Applications/SHOGUN.app/Contents/MacOS/\n";
   } else if (os === "linux") {
     cliInstructions =
       "# 1. Open Terminal\n# 2. Navigate to: /usr/local/bin/\n#    Type: cd /usr/local/bin/\n";
@@ -134,7 +134,7 @@ export const DevModeSettings = ({ localDataDir }: { localDataDir: string }) => {
         duration: 3000,
       });
     } catch (error) {
-      console.error("failed to start screenpipe:", error);
+      console.error("failed to start SHOGUN:", error);
       toastId.update({
         id: toastId.id,
         title: "error",
