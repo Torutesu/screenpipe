@@ -914,13 +914,15 @@ async fn main() -> anyhow::Result<()> {
     std::fs::create_dir_all(&pipes_dir).ok();
 
     let user_token = std::env::var("SCREENPIPE_API_KEY").ok();
-    let pi_executor = std::sync::Arc::new(screenpipe_core::agents::pi::PiExecutor::new(user_token));
+    let pi_executor = std::sync::Arc::new(screenpipe_core::agents::pi::PiExecutor::new(user_token.clone()));
+    let cc_executor = std::sync::Arc::new(screenpipe_core::agents::claude_code::ClaudeCodeExecutor::new(user_token));
 
     let mut agent_executors: std::collections::HashMap<
         String,
         std::sync::Arc<dyn screenpipe_core::agents::AgentExecutor>,
     > = std::collections::HashMap::new();
     agent_executors.insert("pi".to_string(), pi_executor.clone());
+    agent_executors.insert("claude-code".to_string(), cc_executor.clone());
 
     // Create pipe store backed by the main SQLite DB
     let pipe_store: Option<std::sync::Arc<dyn screenpipe_core::pipes::PipeStore>> =
@@ -969,6 +971,13 @@ async fn main() -> anyhow::Result<()> {
     tokio::spawn(async move {
         if let Err(e) = pi_executor.ensure_installed().await {
             tracing::warn!("pi agent install failed: {}", e);
+        }
+    });
+
+    // Install claude-code agent in background
+    tokio::spawn(async move {
+        if let Err(e) = cc_executor.ensure_installed().await {
+            tracing::warn!("claude-code agent install failed: {}", e);
         }
     });
 

@@ -28,6 +28,7 @@
 use chrono::Weekday;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use std::path::Path;
 
 use super::{PipeConfig, PipePermissionsConfig};
 
@@ -42,6 +43,15 @@ pub trait PipeTokenRegistry: Send + Sync {
 // Rule types
 // ---------------------------------------------------------------------------
 
+/// Filesystem access mode for `Fs` permission rules.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum FsMode {
+    Read,
+    Write,
+    Execute,
+}
+
 /// A parsed permission rule — one entry from an allow/deny list.
 /// Serialized as `{"type": "api", "method": "GET", "path": "/search"}` for TS compat.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -55,6 +65,12 @@ pub enum PermissionRule {
     Window { value: String },
     /// `Content(type)` — content type: ocr, audio, input, accessibility.
     Content { value: String },
+    /// `Net(host:port)` — network destination allowlisting.
+    Net { host: String, port: Option<u16> },
+    /// `Fs(mode path)` — filesystem access control.
+    Fs { mode: FsMode, path: String },
+    /// `Exec(name)` — allowed executable.
+    Exec { value: String },
 }
 
 /// Parse a rule string like `Api(GET /search)`, `App(Slack, Chrome)`,
@@ -101,6 +117,15 @@ pub fn parse_rules(s: &str) -> Vec<PermissionRule> {
             })
             .filter(|r| !matches!(r, PermissionRule::Content { value: s } if s.is_empty()))
             .collect(),
+        "net" => parse_net_rules(inner),
+        "fs" => parse_fs_rules(inner),
+        "exec" => inner
+            .split(',')
+            .map(|s| PermissionRule::Exec {
+                value: s.trim().to_string(),
+            })
+            .filter(|r| !matches!(r, PermissionRule::Exec { value: s } if s.is_empty()))
+            .collect(),
         _ => vec![], // Unknown type, ignore
     }
 }
@@ -116,6 +141,96 @@ fn parse_bare_api(s: &str) -> Option<PermissionRule> {
         method: method.to_uppercase(),
         path: path.to_string(),
     })
+}
+
+/// Parse `Net(host:port)` rules.
+///
+/// Supports:
+/// - `Net(api.openai.com:443)` → single host+port
+/// - `Net(api.openai.com)` → host only (any port)
+/// - `Net(*)` → wildcard (all destinations)
+/// - `Net(localhost:*)` → host with wildcard port
+/// - Comma-separated: `Net(api.openai.com:443, example.com)` → multiple rules
+fn parse_net_rules(inner: &str) -> Vec<PermissionRule> {
+    inner
+        .split(',')
+        .filter_map(|s| {
+            let s = s.trim();
+            if s.is_empty() {
+                return None;
+            }
+            if s == "*" {
+                return Some(PermissionRule::Net {
+                    host: "*".to_string(),
+                    port: None,
+                });
+            }
+            // Try to split on the last ':' for host:port
+            if let Some(colon_pos) = s.rfind(':') {
+                let host = s[..colon_pos].trim().to_string();
+                let port_str = s[colon_pos + 1..].trim();
+                if port_str == "*" || host.is_empty() {
+                    Some(PermissionRule::Net {
+                        host: if host.is_empty() {
+                            s.to_string()
+                        } else {
+                            host
+                        },
+                        port: None,
+                    })
+                } else if let Ok(port) = port_str.parse::<u16>() {
+                    Some(PermissionRule::Net {
+                        host,
+                        port: Some(port),
+                    })
+                } else {
+                    // Not a valid port, treat the whole thing as a host
+                    Some(PermissionRule::Net {
+                        host: s.to_string(),
+                        port: None,
+                    })
+                }
+            } else {
+                Some(PermissionRule::Net {
+                    host: s.to_string(),
+                    port: None,
+                })
+            }
+        })
+        .collect()
+}
+
+/// Parse `Fs(mode path)` rules.
+///
+/// Supports:
+/// - `Fs(read ./data)` → read access to ./data
+/// - `Fs(write ./output)` → write access to ./output
+/// - `Fs(execute ./bin)` → execute access to ./bin
+fn parse_fs_rules(inner: &str) -> Vec<PermissionRule> {
+    let trimmed = inner.trim();
+    if trimmed.is_empty() {
+        return vec![];
+    }
+    // Split on the first space to get mode and path
+    let mut parts = trimmed.splitn(2, ' ');
+    let mode_str = match parts.next() {
+        Some(m) => m.trim(),
+        None => return vec![],
+    };
+    let path = match parts.next() {
+        Some(p) => p.trim(),
+        None => return vec![],
+    };
+    let mode = match mode_str.to_lowercase().as_str() {
+        "read" => FsMode::Read,
+        "write" => FsMode::Write,
+        "execute" | "exec" => FsMode::Execute,
+        _ => return vec![],
+    };
+    vec![PermissionRule::Fs {
+        mode,
+        path: path.to_string(),
+    }]
 }
 
 // ---------------------------------------------------------------------------

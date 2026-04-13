@@ -5,15 +5,15 @@
     "": {
       "name": "screenpipe-mcp",
       "dependencies": {
-        "@modelcontextprotocol/sdk": "latest",
-        "ws": "latest",
+        "@modelcontextprotocol/sdk": "^1.27.1",
+        "ws": "^8.19.0",
       },
       "devDependencies": {
-        "@types/node": "latest",
-        "@types/ws": "latest",
-        "ts-node": "latest",
-        "typescript": "latest",
-        "vitest": "latest",
+        "@types/node": "^25.3.5",
+        "@types/ws": "^8.18.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18",
       },
     },
   },

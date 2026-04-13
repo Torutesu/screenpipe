@@ -16,6 +16,7 @@ import { WebSocket } from "ws";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { WebSocketBridge, ScreenpipeEvent, ScreenpipeEventType } from "./ws-bridge.js";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -27,6 +28,9 @@ for (let i = 0; i < args.length; i++) {
 }
 
 const SCREENPIPE_API = `http://localhost:${port}`;
+
+// WebSocket bridge for real-time events (initialized in main())
+let wsBridge: WebSocketBridge;
 
 // Read version from package.json (single source of truth)
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -42,6 +46,7 @@ const server = new Server(
     capabilities: {
       tools: {},
       resources: {},
+      logging: {},
     },
   }
 );
@@ -402,6 +407,87 @@ const TOOLS: Tool[] = [
         action: { type: "string", enum: ["start-audio", "stop-audio"], description: "Recording action" },
       },
       required: ["action"],
+    },
+  },
+  {
+    name: "subscribe-events",
+    description:
+      "Subscribe to real-time screenpipe events (app switches, transcriptions, screen changes, meetings, workflows). " +
+      "Returns a subscription ID. Events are delivered as MCP log notifications. " +
+      "Use unsubscribe-events to stop, or poll-events for one-shot queries.",
+    annotations: { title: "Subscribe Events", readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    inputSchema: {
+      type: "object",
+      properties: {
+        event_types: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["screen_change", "app_switch", "new_transcription", "meeting_started", "meeting_ended", "workflow_event"],
+          },
+          description: "Event types to subscribe to. Omit for all types.",
+        },
+        app_filter: {
+          type: "string",
+          description: "Only receive events from apps whose name contains this string (case-insensitive).",
+        },
+        min_interval_ms: {
+          type: "integer",
+          description: "Minimum interval between events of the same type (ms). Default 5000.",
+          default: 5000,
+        },
+        include_text: {
+          type: "boolean",
+          description: "Include text content in events. Set false to reduce noise. Default true.",
+          default: true,
+        },
+      },
+    },
+  },
+  {
+    name: "unsubscribe-events",
+    description:
+      "Unsubscribe from a real-time event subscription created by subscribe-events.",
+    annotations: { title: "Unsubscribe Events", readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    inputSchema: {
+      type: "object",
+      properties: {
+        subscription_id: {
+          type: "string",
+          description: "Subscription ID returned by subscribe-events.",
+        },
+      },
+      required: ["subscription_id"],
+    },
+  },
+  {
+    name: "poll-events",
+    description:
+      "Poll for recent screenpipe events from a ring buffer (last 100 events). " +
+      "Use for one-shot queries instead of subscribing. " +
+      "Returns events matching filters, newest last.",
+    annotations: { title: "Poll Events", readOnlyHint: true, openWorldHint: false, idempotentHint: true },
+    inputSchema: {
+      type: "object",
+      properties: {
+        since: {
+          type: "string",
+          description: "ISO 8601 timestamp. Only return events after this time. Default: 30 seconds ago.",
+        },
+        event_types: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["screen_change", "app_switch", "new_transcription", "meeting_started", "meeting_ended", "workflow_event"],
+          },
+          description: "Filter by event types. Omit for all types.",
+        },
+        limit: {
+          type: "integer",
+          description: "Max events to return (default 20).",
+          default: 20,
+        },
+      },
     },
   },
 ];
@@ -1290,6 +1376,119 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      case "subscribe-events": {
+        const eventTypes = (args.event_types as ScreenpipeEventType[] | undefined) || undefined;
+        const appFilter = (args.app_filter as string | undefined) || undefined;
+        const minIntervalMs = typeof args.min_interval_ms === "number" ? args.min_interval_ms : 5000;
+        const includeText = args.include_text !== false;
+
+        const subscriptionId = wsBridge.subscribe(
+          {
+            event_types: eventTypes,
+            app_filter: appFilter,
+            min_interval_ms: minIntervalMs,
+            include_text: includeText,
+          },
+          (event: ScreenpipeEvent) => {
+            try {
+              server.sendLoggingMessage({
+                level: "info",
+                data: JSON.stringify(event),
+                logger: `screenpipe-events/${subscriptionId}`,
+              });
+            } catch {
+              // If logging fails (client disconnected), clean up subscription
+              wsBridge.unsubscribe(subscriptionId);
+            }
+          }
+        );
+
+        const filterDesc = [
+          eventTypes ? `types=[${eventTypes.join(",")}]` : "types=all",
+          appFilter ? `app="${appFilter}"` : null,
+          `interval=${minIntervalMs}ms`,
+          includeText ? null : "text=excluded",
+        ]
+          .filter(Boolean)
+          .join(", ");
+
+        return {
+          content: [
+            {
+              type: "text",
+              text:
+                `Subscribed to events (${filterDesc}).\n` +
+                `Subscription ID: ${subscriptionId}\n` +
+                `Events will be delivered as MCP log notifications.\n` +
+                `Use unsubscribe-events with this ID to stop.` +
+                (wsBridge.isConnected ? "" : "\nNote: WebSocket is currently disconnected — events will arrive once reconnected."),
+            },
+          ],
+        };
+      }
+
+      case "unsubscribe-events": {
+        const subscriptionId = args.subscription_id as string;
+        if (!subscriptionId) {
+          return { content: [{ type: "text", text: "Error: subscription_id is required" }] };
+        }
+        const removed = wsBridge.unsubscribe(subscriptionId);
+        if (removed) {
+          return {
+            content: [{ type: "text", text: `Unsubscribed: ${subscriptionId}` }],
+          };
+        } else {
+          return {
+            content: [{ type: "text", text: `Subscription not found: ${subscriptionId}` }],
+          };
+        }
+      }
+
+      case "poll-events": {
+        const since = (args.since as string | undefined) || undefined;
+        const eventTypes = (args.event_types as ScreenpipeEventType[] | undefined) || undefined;
+        const limit = typeof args.limit === "number" ? args.limit : 20;
+
+        const events = wsBridge.pollEvents({ since, event_types: eventTypes, limit });
+
+        if (events.length === 0) {
+          return {
+            content: [
+              {
+                type: "text",
+                text:
+                  "No events found in the buffer matching your filters." +
+                  (wsBridge.isConnected ? "" : " (WebSocket is currently disconnected)"),
+              },
+            ],
+          };
+        }
+
+        const formatted = events.map((e) => {
+          const parts = [`[${e.event_type}] ${e.timestamp}`];
+          if (e.data.app_name) parts.push(`app: ${e.data.app_name}`);
+          if (e.data.window_name) parts.push(`window: ${e.data.window_name}`);
+          if (e.data.previous_app) parts.push(`from: ${e.data.previous_app}`);
+          if (e.data.speaker) parts.push(`speaker: ${e.data.speaker}`);
+          if (e.data.device) parts.push(`device: ${e.data.device}`);
+          if (e.data.meeting_app) parts.push(`meeting_app: ${e.data.meeting_app}`);
+          if (e.data.meeting_title) parts.push(`meeting: ${e.data.meeting_title}`);
+          if (e.data.workflow_type) parts.push(`workflow: ${e.data.workflow_type}`);
+          if (e.data.description) parts.push(`desc: ${e.data.description}`);
+          if (e.data.text) parts.push(`text: ${e.data.text}`);
+          return parts.join("\n  ");
+        });
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Events: ${events.length}\n\n${formatted.join("\n---\n")}`,
+            },
+          ],
+        };
+      }
+
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -1303,9 +1502,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Run the server
 async function main() {
+  // Initialize the WebSocket bridge for real-time events
+  wsBridge = new WebSocketBridge(port);
+  await wsBridge.connect();
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("Screenpipe MCP server running on stdio");
+
+  // Graceful shutdown
+  const shutdown = () => {
+    console.error("[mcp] shutting down");
+    wsBridge.shutdown();
+    process.exit(0);
+  };
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
 
 main().catch((error) => {

@@ -1,0 +1,13 @@
+[package]
+name = "screenpipe-embeddings"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ort = { version = "=2.0.0-rc.6", features = ["download-binaries"] }
+hf-hub = { workspace = true }
+tokenizers = { workspace = true }
+ndarray = "0.16"
+anyhow = "1"
+tracing = { workspace = true }
+tokio = { version = "1", features = ["sync"] }
